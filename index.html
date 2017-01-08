@@ -19,9 +19,10 @@
 		</p>
 	</form>
 
-	<a href="javascript:lockToggle()" id="lock"></a>
-
 	<h4>課程表 Timetable</h4>
+	<a href="javascript:lockToggle()" id="lock">
+		<span id="lock-on">檢視模式<br><small>View Mode</small></span><span id="lock-off">修改模式<br><small>Edit Mode</small></span>
+	</a>
 
 	<div id="wrapper">
 		<div id="overlay"></div>
@@ -68,6 +69,8 @@
 	var courses = [
 	];
 
+	var viewOnly = false;
+
 	var used_colors = {};
 
 	if(localStorage["coursesJson"]){
@@ -111,21 +114,28 @@
 		genIt()
 	}
 
-	function genIt(){
+	function genIt(courses_list){
+
+		if(!courses_list){
+			courses_list = courses;
+			viewOnly = false;
+		}
+		else{
+			viewOnly = true;
+		}
 
 		courseListDiv.innerHTML = "";
 
-		if(localStorage["lockMode"] && localStorage["lockMode"]==="lock"){
+		if(viewOnly===true || (localStorage["lockMode"] && localStorage["lockMode"]==="lock")){
 			document.getElementById("overlay").className = "lock";
-
 			document.getElementById("lock").className = "lock";
-			document.getElementById("lock").innerHTML = "按此解鎖 Click to unlock<br><small>解鎖後，你將可以從課程表中刪除科目<br>Unlock to remove course(s) from timetable.</small>";
+			localStorage["lockMode"] = "lock";
+			// document.getElementById("lock").innerHTML = "按此解鎖 Click to unlock<br><small>解鎖後，你將可以從課程表中刪除科目<br>Unlock to remove course(s) from timetable.</small>";
 		}
 		else{
 			document.getElementById("overlay").className = "unlock";
-
 			document.getElementById("lock").className = "unlock";
-			document.getElementById("lock").innerHTML = "按此鎖定 Click to lock<br><small>鎖定課程表能避免誤刪課程<br>Lock to protect course(s) from removing.</small>";
+			// document.getElementById("lock").innerHTML = "按此鎖定 Click to lock<br><small>鎖定課程表能避免誤刪課程<br>Lock to protect course(s) from removing.</small>";
 		}
 
 		earliest = undefined;
@@ -143,12 +153,12 @@
 			day[i].style.height = totalHeight + 'px';
 		}
 
-		for(var i=0; i<courses.length; i++){
-			var starttime = (parseInt(courses[i].start.substr(0,2)) * 60) + (parseInt(courses[i].start.substr(3,2)) * 1);
-			var endtime = (parseInt(courses[i].end.substr(0,2)) * 60) + (parseInt(courses[i].end.substr(3,2)) * 1);
+		for(var i=0; i<courses_list.length; i++){
+			var starttime = (parseInt(courses_list[i].start.substr(0,2)) * 60) + (parseInt(courses_list[i].start.substr(3,2)) * 1);
+			var endtime = (parseInt(courses_list[i].end.substr(0,2)) * 60) + (parseInt(courses_list[i].end.substr(3,2)) * 1);
 
-			courses[i].startStamp = starttime;
-			courses[i].endStamp   = endtime;
+			courses_list[i].startStamp = starttime;
+			courses_list[i].endStamp   = endtime;
 
 			if(!earliest || earliest > starttime){
 				earliest = starttime;
@@ -181,34 +191,77 @@
 
 		heightOf1Min = totalHeight / (latest - earliest);
 
-		for(var i=0; i<courses.length; i++){
+		for(var i=0; i<courses_list.length; i++){
 
 			var tmpLineHeight = lineHeight;
 
-			var weekday = dayName.indexOf(courses[i].day);
+			var weekday = dayName.indexOf(courses_list[i].day);
 
 			if(weekday > -1){
 
-				var div = document.createElement("a");
-				div.href = "javascript:deleteIt('" + courses[i].code + "')";
-				div.style.top = ((courses[i].startStamp - earliest) * heightOf1Min) + "px";
+				if(viewOnly === true){
 
-				var divHeight = ((courses[i].endStamp - courses[i].startStamp) * heightOf1Min - 12);
+					var basicHTML = "<small>" + courses_list[i].code + "<br><small>" + courses_list[i].start + "-" + courses_list[i].end + " @ " + courses_list[i].venue + "</small></small>";
+					var prevFound = false;
+
+					for(var k=0; k<i; k++){
+						if(
+							(courses_list[k].start === courses_list[i].start) &&
+							(courses_list[k].end === courses_list[i].end) &&
+							(courses_list[k].day === courses_list[i].day)
+						){
+
+							var div = document.getElementById(courses_list[k].code + "-main");
+							div.innerHTML += "<hr>" + basicHTML;
+							prevFound = true;
+							break;
+
+						}
+					}
+
+					if(prevFound === true){
+						continue;
+					}
+				}
+
+				var div = document.createElement("a");
+
+				// if(viewOnly === false){
+					div.href = "javascript:deleteIt('" + courses_list[i].code + "')";
+				// }
+				// else{
+				// 	div.href = "javascript:void(0)";
+				// }
+
+				div.style.top = ((courses_list[i].startStamp - earliest) * heightOf1Min) + "px";
+
+				var divHeight = ((courses_list[i].endStamp - courses_list[i].startStamp) * heightOf1Min - 12);
 
 				div.style.height = divHeight + "px";
 
 				var paddingTop = (divHeight - (tmpLineHeight*4)) / 2;
 
-				var basicHTML = courses[i].code + "<br><small><small>" + courses[i].name + "</small></small><br><small>" + courses[i].venue + "<br>" + courses[i].start + "-" + courses[i].end + "</small>";
+				if(viewOnly === false){
 
-				if(paddingTop > 0){
-				 	div.innerHTML = basicHTML;
+					var basicHTML = courses_list[i].code + "<br><small><small>" + courses_list[i].name + "</small></small><br><small>" + courses_list[i].venue + "<br>" + courses_list[i].start + "-" + courses_list[i].end + "</small>";
+
+					if(paddingTop > 0){
+					 	div.innerHTML = basicHTML;
+					}
+					else{
+						tmpLineHeight = 8;
+						var paddingTop = (divHeight - (tmpLineHeight*3)) / 2;
+						div.innerHTML = "<small>" + courses_list[i].code + "<br><small>" + courses_list[i].name + "</small><br>" + courses_list[i].start + "-" + courses_list[i].end + ", " + courses_list[i].venue + "</small>";
+					}
 				}
 				else{
-					tmpLineHeight = 8;
-					var paddingTop = (divHeight - (tmpLineHeight*3)) / 2;
-					div.innerHTML = "<small>" + courses[i].code + "<br><small>" + courses[i].name + "</small><br>" + courses[i].start + "-" + courses[i].end + ", " + courses[i].venue + "</small>";
+					tmpLineHeight = 9;
+					var paddingTop = 7;
+					div.innerHTML = basicHTML;
+
+					div.id = courses_list[i].code + "-main";
 				}
+
 
 				if(paddingTop > 0){
 					div.style.paddingTop = paddingTop + "px";
@@ -220,8 +273,8 @@
 
 				var background = "";
 
-				if(used_colors[courses[i].code]){
-					background = used_colors[courses[i].code];
+				if(used_colors[courses_list[i].code]){
+					background = used_colors[courses_list[i].code];
 				}
 				else{
 					for(var k=0; k<colors.length; k++){
@@ -240,16 +293,24 @@
 						}
 					}
 					background = colors[k];
-					used_colors[courses[i].code] = colors[k];
+					used_colors[courses_list[i].code] = colors[k];
+				}
+
+				if(background === undefined){
+					background = "#cccccc";
 				}
 
 				div.style.borderColor = background;
 				div.style.lineHeight = tmpLineHeight + "px";
 
-				var span = document.createElement("span");
-				span.className = "cross";
-				span.innerHTML = "&times;";
-				span.style.height = tmpLineHeight + "px";
+				if(viewOnly === false){
+					var span = document.createElement("span");
+					span.className = "cross";
+					span.innerHTML = "&times;";
+					span.style.height = tmpLineHeight + "px";
+
+					div.appendChild(span);
+				}
 
 				var bgDiv = document.createElement("div");
 				bgDiv.className = "background";
@@ -259,8 +320,6 @@
 				// var altText = document.createElement("div");
 				// altText.className = "alt";
 				// altText.innerHTML = basicHTML;
-
-				div.appendChild(span);
 				div.appendChild(bgDiv);
 				// div.appendChild(altText);
 
@@ -327,40 +386,64 @@
 
 		var previousCourse = "";
 
-		for(var i=0; i<courses.length; i++){
-			if(courses[i].code !== previousCourse){
-				previousCourse = courses[i].code;
+		for(var i=0; i<courses_list.length; i++){
+			if(courses_list[i].code !== previousCourse){
+				previousCourse = courses_list[i].code;
 
 				var li = document.createElement("li");
-				li.innerHTML = "<h3>" + courses[i].code + "</h3>" +
-								"<p>" + courses[i].name + "</p>" +
+				li.innerHTML = "<h3>" + courses_list[i].code + "</h3>" +
+								"<p>" + courses_list[i].name + "</p>" +
 								"<p><u>上課時間及地點 Time & Venue</u></p>" +
-								"<ul id='" + courses[i].code + "'></ul>" + 
-								((courses[i].prof.replace(/\s/g, "")==="")
+								"<ul id='" + courses_list[i].code + "'></ul>" + 
+								((courses_list[i].prof.replace(/\s/g, "")==="")
 									? ""
-									: "<p><u>講師 Lecturer</u><br>" + courses[i].prof + "</p>") +
-								((courses[i].remark.replace(/\s/g, "")==="")
+									: "<p><u>講師 Lecturer</u><br>" + courses_list[i].prof + "</p>") +
+								((courses_list[i].remark.replace(/\s/g, "")==="")
 									? ""
-									: "<p><u>備註 Remark</u><br>" + courses[i].remark.replace(/\n/g, "<br>") + "</p>");
+									: "<p><u>備註 Remark</u><br>" + courses_list[i].remark.replace(/\n/g, "<br>") + "</p>");
 
 //				courseListDiv.insertBefore(li, courseListDiv.querySelector("li"));
 				courseListDiv.appendChild(li);
 			}
 
-			var dayIndex = dayName.indexOf(courses[i].day);
+			var dayIndex = dayName.indexOf(courses_list[i].day);
 
 			if(dayIndex > -1){
-				ul = document.getElementById(courses[i].code);
-				ul.innerHTML += "<li>" + "<b>" + dayDisp[dayIndex] + " - " + courses[i].start + "-" + courses[i].end + "</b><br>" + courses[i].venue + " (" + courses[i].type + ")" + "</li>";
+				ul = document.getElementById(courses_list[i].code);
+				ul.innerHTML += "<li>" + "<b>" + dayDisp[dayIndex] + " - " + courses_list[i].start + "-" + courses_list[i].end + "</b><br>" + courses_list[i].venue + " (" + courses_list[i].type + ")" + "</li>";
 			}
 		}
 
-		localStorage["coursesJson"] = JSON.stringify(courses);
+		if(viewOnly === false){
+			localStorage["coursesJson"] = JSON.stringify(courses_list);
+		}
+	}
+
+	function look(coursecode){
+
+		var courses_list_tmp = [];
+
+		for(var i=0; i<courses_info.length; i++){
+			if(courses_info[i].code.substr(0,7) === coursecode){
+				courses_list_tmp.push(courses_info[i]);
+			}
+		}
+		if(courses_list_tmp.length < 1){
+			errorDiv.innerHTML = "課程不存在";
+		}
+		else{
+			genIt(courses_list_tmp);
+		}
 	}
 
 	function add(){
 		var code_raw = document.getElementById("coursename").value;
 		code_raw = code_raw.replace(/ /g, "").toUpperCase();
+
+		if(code_raw.length < 8){
+			look(code_raw);
+			return;
+		}
 
 		var code = code_raw.substr(0,7) + "-" + code_raw.substr(-3);
 		var existed = false;
@@ -435,7 +518,7 @@
 			padding:20px;
 		}
 		form {
-			padding:5px 0 15px 0;
+			padding:5px 0 25px 0;
 		}
 		div#wrapper {
 			width:888px;
@@ -556,30 +639,56 @@
 		}
 		a#lock {
 			display: block;
-			background:limegreen;
-			color:#fff;
 			text-align: center;
-			padding:10px;
-			margin-bottom: 20px;
+			height:48px;
+			margin: 4px 0 5px;
 			-webkit-border-radius:3px;
 			border-radius:3px;
 			text-decoration: none;
-			font-size: 15px;
-			line-height: 17px;
-			opacity: 0.8;
+			font-size: 14px;
+			line-height: 14px;
+			overflow: hidden;
+			background: #f1f1f1;
+			width:140px;
+			position: relative;
 		}
-		a:hover#lock {
-			opacity: 1;
+		a#lock span {
+			position: absolute;
+			padding:10px 0 0;
+			height:100px;
+			overflow: hidden;
+			-webkit-transition: left 0.2s ease-out, right 0.2s ease-out, background 0.2s ease-out;
+			transition: left 0.2s ease-out, right 0.2s ease-out, background 0.2s ease-out;
 		}
-		a#lock.lock {
-			background:salmon;
+		a #lock-off {
+			left:0;
 		}
-		a#lock small {
-			padding-top: 3px;
-			display: block;
-			font-size: 12px;
-			line-height: 13px;
-			color:rgba(255,255,255,0.8);
+		a #lock-on {
+			right:0;
+		}
+		a #lock-off,
+		a #lock-on {
+			width:70%;
+		}
+		a#lock.unlock #lock-off {
+			background:#0A79F3;
+			color:#fff;
+			z-index:9;
+		}
+		a#lock.lock #lock-on {
+			color:#666;
+			background: #ccc;
+			z-index:9;
+		}
+		a#lock.lock #lock-off,
+		a#lock.unlock #lock-on {
+			color:#ccc;
+		}
+		a#lock.lock #lock-off {
+			left:-10px;
+		}
+		a#lock.unlock #lock-on {
+			right:-10px;
 		}
 		li p {
 			padding-top:8px;
@@ -607,6 +716,13 @@
 		}
 		.daytime#afternoon {
 			background: rgba(255,255,255,0);
+		}
+		hr {
+			border:0;
+			background:transparent;
+			border-top:1px dotted #000;
+			padding:0;
+			margin:3px;
 		}
 	</style>
 
