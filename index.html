@@ -20,6 +20,7 @@
 	</form>
 
 	<h4>課程表 Timetable</h4>
+	<p class="announce">重要聲明：下面列出的課程資訊可能已經過時，本工具之作者將不會對因下述資料的錯誤而產生的一切結果負任何責任，若要查閱最新資訊請參閱 <a href="http://isw.umac.mo">http://isw.umac.mo</a> !</p>
 	<a href="javascript:lockToggle()" id="lock">
 		<span id="lock-on">檢視模式<br><small>View Mode</small></span><span id="lock-off">修改模式<br><small>Edit Mode</small></span>
 	</a>
@@ -130,11 +131,13 @@
 			document.getElementById("overlay").className = "lock";
 			document.getElementById("lock").className = "lock";
 			localStorage["lockMode"] = "lock";
+			var used_colors_list = used_colors;
 			// document.getElementById("lock").innerHTML = "按此解鎖 Click to unlock<br><small>解鎖後，你將可以從課程表中刪除科目<br>Unlock to remove course(s) from timetable.</small>";
 		}
 		else{
 			document.getElementById("overlay").className = "unlock";
 			document.getElementById("lock").className = "unlock";
+			var used_colors_list = [];
 			// document.getElementById("lock").innerHTML = "按此鎖定 Click to lock<br><small>鎖定課程表能避免誤刪課程<br>Lock to protect course(s) from removing.</small>";
 		}
 
@@ -211,7 +214,7 @@
 							(courses_list[k].day === courses_list[i].day)
 						){
 
-							var div = document.getElementById(courses_list[k].code + "-main");
+							var div = document.getElementById(courses_list[k].code + "-" +courses_list[k].start + "-" +courses_list[k].end + "-" +courses_list[k].day);
 							div.innerHTML += "<hr>" + basicHTML;
 							prevFound = true;
 							break;
@@ -259,7 +262,7 @@
 					var paddingTop = 7;
 					div.innerHTML = basicHTML;
 
-					div.id = courses_list[i].code + "-main";
+					div.id = courses_list[i].code + "-" +courses_list[i].start + "-" +courses_list[i].end + "-" +courses_list[i].day;
 				}
 
 
@@ -273,16 +276,16 @@
 
 				var background = "";
 
-				if(used_colors[courses_list[i].code]){
-					background = used_colors[courses_list[i].code];
+				if(used_colors_list[courses_list[i].code]){
+					background = used_colors_list[courses_list[i].code];
 				}
 				else{
 					for(var k=0; k<colors.length; k++){
 
 						var used = false;
 
-						for(var h in used_colors){
-							if(colors[k] === used_colors[h]){
+						for(var h in used_colors_list){
+							if(colors[k] === used_colors_list[h]){
 								used = true;
 								break;
 							}
@@ -293,7 +296,7 @@
 						}
 					}
 					background = colors[k];
-					used_colors[courses_list[i].code] = colors[k];
+					used_colors_list[courses_list[i].code] = colors[k];
 				}
 
 				if(background === undefined){
@@ -416,6 +419,7 @@
 
 		if(viewOnly === false){
 			localStorage["coursesJson"] = JSON.stringify(courses_list);
+			used_colors = used_colors_list;
 		}
 	}
 
@@ -723,6 +727,14 @@
 			border-top:1px dotted #000;
 			padding:0;
 			margin:3px;
+		}
+		p.announce {
+			padding:5px 0;
+			color:crimson;
+			font-size: 14px;
+		}
+		p.announce a {
+			color:crimson;
 		}
 	</style>
 
