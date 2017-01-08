@@ -120,31 +120,32 @@
 		if(!courses_list){
 			courses_list = courses;
 			viewOnly = false;
+
+			var used_colors_list = used_colors;
+			courseListDiv.innerHTML = "";
+			timetable.innerHTML = template;
 		}
 		else{
+			var used_colors_list = {};
+
+			var returns = genIt();
 			viewOnly = true;
 		}
-
-		courseListDiv.innerHTML = "";
 
 		if(viewOnly===true || (localStorage["lockMode"] && localStorage["lockMode"]==="lock")){
 			document.getElementById("overlay").className = "lock";
 			document.getElementById("lock").className = "lock";
 			localStorage["lockMode"] = "lock";
-			var used_colors_list = used_colors;
 			// document.getElementById("lock").innerHTML = "按此解鎖 Click to unlock<br><small>解鎖後，你將可以從課程表中刪除科目<br>Unlock to remove course(s) from timetable.</small>";
 		}
 		else{
 			document.getElementById("overlay").className = "unlock";
 			document.getElementById("lock").className = "unlock";
-			var used_colors_list = [];
 			// document.getElementById("lock").innerHTML = "按此鎖定 Click to lock<br><small>鎖定課程表能避免誤刪課程<br>Lock to protect course(s) from removing.</small>";
 		}
 
 		earliest = undefined;
 		latest = undefined;
-
-		timetable.innerHTML = template;
 
 		document.getElementById("morning").style.height = 0 + "px";
 		document.getElementById("night").style.height = 0 + "px";
@@ -299,7 +300,7 @@
 					used_colors_list[courses_list[i].code] = colors[k];
 				}
 
-				if(background === undefined){
+				if(background === undefined || viewOnly === true){
 					background = "#cccccc";
 				}
 
@@ -421,6 +422,7 @@
 			localStorage["coursesJson"] = JSON.stringify(courses_list);
 			used_colors = used_colors_list;
 		}
+		return true;
 	}
 
 	function look(coursecode){
@@ -436,6 +438,7 @@
 			errorDiv.innerHTML = "課程不存在";
 		}
 		else{
+			errorDiv.innerHTML = "";
 			genIt(courses_list_tmp);
 		}
 	}
