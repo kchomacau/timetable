@@ -117,6 +117,8 @@
 
 	function genIt(courses_list){
 
+//		courses = courses.sort(function(a,b){return a.code > b.code});
+
 		var used_colors_list = used_colors;
 
 		if(!courses_list){
@@ -179,24 +181,18 @@
 			}
 		}
 
-		if((latest-earliest) < 285){
-			if(latest > 945){
-				earliest = parseInt((latest - 285) / 30) * 30;
-			}
-			else if(earliest < 660){
-				latest = parseInt((earliest + 285) / 30) * 30;
-			}
-			else{
-				earliest = 660;
-				latest = 945;
-			}
+		if(earliest !== (8.5 * 60)){
+			earliest -= 30;
+		}
+		if(latest !== (21*60 + 45)){
+			latest += 30;
 		}
 
-		if(earliest > (12.5*60)){
-			earliest = 12.5*60;
+		if(earliest > (12.5 * 60)){
+			earliest = (12.5 * 60);
 		}
-		if(latest < (13.5*60)){
-			latest = 13.5*60;
+		if(latest < (15.5 * 60)){
+			latest = (15.5 * 60);
 		}
 		
 
@@ -319,7 +315,12 @@
 					span.className = "cross";
 					span.innerHTML = "&times;";
 					span.style.height = tmpLineHeight + "px";
+					div.appendChild(span);
 
+					var span = document.createElement("span");
+					span.className = "alt-text";
+					span.innerHTML = courses_list[i].code;
+					span.style.height = tmpLineHeight + "px";
 					div.appendChild(span);
 				}
 
@@ -563,6 +564,8 @@
 			width:130px;
 			float:left;
 			border:2px solid #ccc;
+			border-top:0;
+			border-bottom:0;
 			margin:5px 0 5px 5px;
 			position: relative;
 		}
@@ -584,6 +587,7 @@
 			top:-35px;
 		}
 		span.cross,
+		span.alt-text,
 		div.col div.background,
 		div#wrapper div#overlay {
 			position: absolute;
@@ -598,10 +602,20 @@
 		div#wrapper div#overlay.unlock {
 			display: none;
 		}
-		span.cross {
-			font-size: 40px;
+		span.cross,
+		span.alt-text {
+			font-size: 36px;
 			margin: auto;
 			opacity:0;
+			padding:0 0 9px 0;
+			color:#fff;
+		}
+		span.alt-text {
+			font-size: 12px;
+			padding:22px 0 0 0;
+			-webkit-transform:scale(0.75);
+			transform:scale(0.75);
+			color:rgba(255,255,255,0.8);
 		}
 		div.col div.background {
 			opacity:0.6;
@@ -616,9 +630,9 @@
 		div.col a:hover div.background {
 			opacity:1;
 		}
-		div.col a:hover span.cross {
+		div.col a:hover span.cross,
+		div.col a:hover span.alt-text {
 			opacity: 1;
-			color:#fff;
 		}
 		div.col.timestamps {
 			color:#ccc;
