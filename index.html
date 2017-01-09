@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-tw">
 <head>
@@ -181,20 +182,25 @@
 			}
 		}
 
-		if(earliest !== (8.5 * 60)){
-			earliest -= 30;
+		if(earliest === undefined){
+			earliest = 11.5*60;
+			latest = 16.5*60;
 		}
-		if(latest !== (21*60 + 45)){
-			latest += 30;
-		}
+		else{
+			if(earliest > (9*60 + 30)){
+				earliest -= 30;
+			}
+			if(latest < (18*60)){
+				latest += 30;
+			}
 
-		if(earliest > (12.5 * 60)){
-			earliest = (12.5 * 60);
+			if(earliest > (12.5 * 60)){
+				earliest = (12.5 * 60);
+			}
+			if(latest < (15.5 * 60)){
+				latest = (15.5 * 60);
+			}
 		}
-		if(latest < (15.5 * 60)){
-			latest = (15.5 * 60);
-		}
-		
 
 		heightOf1Min = totalHeight / (latest - earliest);
 
@@ -357,9 +363,6 @@
 		}
 
 		night_height = night_height * heightOf1Min - (lineHeight/2);
-		if(night_height < 1){
-			night_height = 0;
-		}
 
 		document.getElementById("morning").style.height = morning_height + "px";
 		document.getElementById("morning").style.lineHeight = morning_height + "px";
@@ -368,12 +371,14 @@
 			document.getElementById("morning").style.lineHeight = 1 + "px";
 		}
 
+		if(night_height < 30){
+			night_height = 0;
+		}
 		document.getElementById("night").style.height = night_height + "px";
 		document.getElementById("night").style.lineHeight = night_height + "px";
 		
 		var afternoon_height = totalHeight - night_height - morning_height;
 		morning_height += 35;
-		night_height += 5;
 
 		document.getElementById("afternoon").style.top = morning_height + "px";
 		document.getElementById("afternoon").style.height = afternoon_height + "px";
@@ -552,6 +557,7 @@
 		}
 		div#timetable {
 			width:978px;
+			position: relative;
 			overflow: hidden;
 			zoom:2;
 			-webkit-transform:scale(0.5);
@@ -736,7 +742,6 @@
 		.daytime {
 			position: absolute;
 			z-index:-3;
-			background:#f1f1f1;
 			color:#ccc;
 			font-size:28px;
 			letter-spacing: 5px;
@@ -752,7 +757,9 @@
 			bottom:5px;
 		}
 		.daytime#afternoon {
-			background: rgba(255,255,255,0);
+			border:5px dotted #ccc;
+			border-left: 0;
+			border-right: 0;
 		}
 		hr {
 			border:0;
