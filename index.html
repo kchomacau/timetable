@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-tw">
 <head>
@@ -104,7 +103,20 @@
 	var wrapper = document.getElementById("wrapper");
 	wrapper.style.height = (totalHeight + 60) + "px";
 
+	var hasUrlParam = false;
 
+	function changeValue(courseCode){
+		document.getElementById("coursename").value = courseCode;
+		return true;
+	}
+
+	var urlParam = window.location.search;
+	if(urlParam.indexOf("course=") > -1){
+		var courseCode_param = urlParam.substr(urlParam.indexOf("course=")+7, 7);
+		changeValue(courseCode_param);
+		add(courseCode_param);
+		hasUrlParam = true;
+	}
 
 	function lockToggle(){
 		if(localStorage["lockMode"] && localStorage["lockMode"]==="lock"){
@@ -462,8 +474,14 @@
 		}
 	}
 
-	function add(){
-		var code_raw = document.getElementById("coursename").value;
+	function add(coursecode){
+
+		if(!coursecode){
+			var code_raw = document.getElementById("coursename").value;
+		}
+		else{
+			var code_raw = coursecode;
+		}
 		code_raw = code_raw.replace(/ /g, "").toUpperCase();
 
 		if(code_raw.length < 8){
@@ -518,8 +536,10 @@
 		genIt();
 	}
 
-	genIt();
-
+	if(hasUrlParam === false){
+		genIt();
+	}
+	
 	</script>
 
 	<style>
