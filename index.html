@@ -13,7 +13,11 @@
 	<form action="javascript:add()">
 		<p>
 			<label for="time">課程編號 Course Code</label>
-			<input type="text" id="coursename" placeholder="DROP101-015" autocomplete="off">
+			<div class="input-wrap">
+				<input type="text" id="coursename" placeholder="DROP101-015" autocomplete="off" onkeyup="getsuggestion()">
+				<ul id="suggestion">
+				</ul>
+			</div>
 			<input type="submit" value="加入 Add">
 			<span id="error"></span>
 		</p>
@@ -539,6 +543,52 @@
 	if(hasUrlParam === false){
 		genIt();
 	}
+
+	var timeout = undefined;
+
+	function fetchIt(){
+
+		var input = document.getElementById("coursename").value;
+		input = input.replace(/ /g, "").toUpperCase();
+
+		document.getElementById("suggestion").innerHTML = "";
+
+		if(input.length < 3){
+			return false;
+		}
+
+		var added = [];
+
+		for(var i=0; i<courses_info.length; i++){
+			if(input === courses_info[i].code.substr(0, input.length)){
+
+				var coursecode = courses_info[i].code.substr(0, 7);
+
+				if(added.indexOf(coursecode) === -1){
+
+					var li = document.createElement("li");
+					var a = document.createElement("a");
+					a.innerHTML = "<b>" + coursecode + "</b><br>" + courses_info[i].name + "</a>";
+					a.href = "javascript:add('" + coursecode + "')";
+					li.appendChild(a);
+					document.getElementById("suggestion").appendChild(li);
+
+					added.push(coursecode);
+				}
+			}
+		}
+	}
+
+	function getsuggestion(){
+
+		if(timeout !== undefined){
+			window.clearInterval(timeout);
+		}
+
+		timeout = window.setTimeout(function(){
+			fetchIt();
+		}, 300);
+	}
 	
 	</script>
 
@@ -795,6 +845,50 @@
 		}
 		p.announce a {
 			color:crimson;
+		}
+
+		.input-wrap {
+			position: relative;
+			display: inline-block;
+		}
+		ul#suggestion,
+		ul#suggestion li {
+			margin:0;
+			padding:0;
+			outline:0;
+		}
+		ul#suggestion {
+			position: absolute;
+			width: 130%;
+			background:#f1f1f1;
+			z-index:101;
+			margin-top:-1;
+			margin-bottom:25px;
+		}
+		ul#suggestion li {
+			display: block;
+			margin:3px 3px 0 3px;
+			background: #fff;
+			padding:10px;
+		}
+		ul#suggestion li a {
+			display: block;
+			text-decoration: none;
+			font-size:12px;
+			padding:0;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			color:#999;
+			text-transform: lowercase;
+		}
+		ul#suggestion li a b {
+			font-size:14px;
+			font-weight: normal;
+			color:#222;
+		}
+		ul#suggestion li:last-child {
+			margin-bottom:8px;
 		}
 	</style>
 
