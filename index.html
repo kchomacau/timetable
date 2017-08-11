@@ -25,6 +25,11 @@
 			<br>
 			Full-digit (e.g., "EDPE101 001") for adding the course to the simulator below.
 		</li>
+		<li>
+			部份 FST 課堂區分 Lab A 及 Lab B，在本表中將以 X 及 Y 區分，唯實際情況下，該課時編號應為「001/LAB-LXX」。
+			<br>
+			Some courses for FST are divided two labs. "X" and "Y" are used below, while the real situation should be "001/LAB-LXX".
+		</li>
 	</ul>
 	<p>&nbsp;</p>
 
@@ -34,7 +39,8 @@
 				課程編號 Course Code
 			</label>
 			<div class="input-wrap">
-				<input type="search" id="coursename" placeholder="EDPE101-001" autocomplete="off" onsearch="getsuggestion()" onkeyup="getsuggestion()">
+				<input type="text" id="coursename" placeholder="EDPE101-001" autocomplete="off" onkeyup="getsuggestion()">
+				<a href="javascript:clear_input()" class="pclear">&times;</a>
 				<ul id="suggestion">
 				</ul>
 			</div>
@@ -44,7 +50,13 @@
 	</form>
 
 	<h4>模擬課程表 Timetable Simulator</h4>
-	<p class="announce">重要聲明：下面列出的課程資訊可能已經過時，本工具之作者將不會對因閣下使用下述資料而產生的一切結果負任何責任，若要查閱最新資訊請參閱 <a href="http://isw.umac.mo">http://isw.umac.mo</a> !</p>
+	<ul class="inst">
+		<li class="announce">
+			重要聲明：下面列出的課程資訊可能已經過時，本工具之作者將不會對因閣下使用下述資料而產生的一切結果負任何責任，若要查閱最新資訊請參閱 <a href="http://isw.umac.mo">http://isw.umac.mo</a> !
+			<br>
+			Information listed below may be outdated. No responsibility will be taken by the developer. For latest info, pls refer to <a href="http://isw.umac.mo">http://isw.umac.mo</a>.
+		</li>
+	</ul>
 	<a href="javascript:lockToggle()" id="lock">
 		<span id="lock-on">檢視模式<br><small>View Mode</small></span><span id="lock-off">修改模式<br><small>Edit Mode</small></span>
 	</a>
@@ -79,10 +91,12 @@
 
 	<p>&nbsp;</p>
 
+	<div id="courses-list">
 	<h4>課程 Courses</h4>
 	<ul id="courselist">
 
 	</ul>
+	</div>
 
 	<script src="courses.js"></script>
 
@@ -142,9 +156,11 @@
 		if(!courses_list){
 			courses_list = courses;
 			allCourseMode = false;
+			document.getElementById("courses-list").className = "active";
 		}
 		else{
 			allCourseMode = true;
+			document.getElementById("courses-list").className = "inactive";
 			for(var i=courses.length-1; i>=0; i--){
 				courses_list.unshift(courses[i]);
 			}
@@ -218,8 +234,11 @@
 							(courses_list[k].end === courses_list[i].end) &&
 							(courses_list[k].day === courses_list[i].day)
 						){
-							var div = document.getElementById(courses_list[k].code + "-" +courses_list[k].start + "-" +courses_list[k].end + "-" +courses_list[k].day);
-							div.innerHTML += "<hr>" + basicHTML;
+
+							if(courses_list[i].code !== courses_list[k].code){
+								var div = document.getElementById(courses_list[k].code + "-" +courses_list[k].start + "-" +courses_list[k].end + "-" +courses_list[k].day);
+								div.innerHTML += "<hr>" + basicHTML;
+							}
 							prevFound = true;
 							break;
 						}
@@ -370,7 +389,8 @@
 									: "<p><u>講師 Lecturer</u><br>" + courses_list[i].prof + "</p>") +
 								((courses_list[i].remark.replace(/\s/g, "")==="")
 									? ""
-									: "<p><u>備註 Remark</u><br>" + courses_list[i].remark.replace(/\n/g, "<br>") + "</p>");
+									: "<p><u>備註 Remark</u><br>" + courses_list[i].remark.replace(/\n/g, "<br>") + "</p>") +
+								'<a href="javascript:add(\'' +courses_list[i].code+ '\')">加入 Add</a>';
 				if(allCourseMode===true){
 					if(i < courses.length){
 						li.className = "inactive";
@@ -407,6 +427,9 @@
 		}
 	}
 	function add(coursecode){
+
+		document.getElementById("suggestion").innerHTML = "";
+
 		if(!coursecode){
 			var code_raw = document.getElementById("coursename").value;
 		}
@@ -414,6 +437,9 @@
 			var code_raw = coursecode;
 		}
 		code_raw = code_raw.replace(/ /g, "").toUpperCase();
+
+		document.getElementById("coursename").value = code_raw;
+
 		if(code_raw.length < 8){
 			look(code_raw);
 			return;
@@ -439,13 +465,19 @@
 			}
 		}
 		if(count === 0){
-			errorDiv.innerHTML = "課程不存在";
+			return look(code_raw.substr(0,7));
 		}
 		else{
 			errorDiv.innerHTML = "";
 			document.getElementById("coursename").value = "";
+			localStorage["lockMode"] = "unlock";
 		}
 		genIt()
+	}
+	function clear_input(){
+		document.getElementById("coursename").value = "";
+		fetchIt();
+		genIt();
 	}
 	function deleteIt(courseCode){
 		for(var i=courses.length-1; i>=0; i--){
@@ -491,6 +523,24 @@
 			fetchIt();
 		}, 300);
 	}
+
+	function find_multi_lab(){
+		var prev = "";
+		var c = 0;
+		for(var r of courses_info){
+			if(r.code !== prev){
+
+			if(c > 1)
+				console.log(prev, c);
+
+				prev = r.code;
+				c = 0;
+		    }
+			if(r.type!=="Lecture"){
+				c++;
+		    }
+		}
+	}
 	
 	</script>
 
@@ -515,6 +565,9 @@
 		}
 		li.inactive {
 			color:#aaa;
+		}
+		li.inactive a {
+			display: none;
 		}
 		li ul li {
 			padding:5px 0;
@@ -630,7 +683,7 @@
 		label {
 			font-size: 13px;
 		}
-		input[type="search"]{
+		input[type="text"]{
 			font-size:16px;
 			padding:5px;
 			border:1px solid #ddd;
@@ -638,10 +691,10 @@
 			border-radius:3px;
 			outline:0;
 		}
-		input[type="search"]:hover {
+		input[type="text"]:hover {
 			border-color:#999;
 		}
-		input[type="search"]:focus {
+		input[type="text"]:focus {
 			border-color:#0089ff;
 		}
 		input[type="submit"]{
@@ -751,13 +804,13 @@
 			padding:0;
 			margin:3px;
 		}
-		p.announce {
+		li.announce {
 			padding:5px 0;
-			color:crimson;
+			color:#ff6a00;
 			font-size: 14px;
 		}
-		p.announce a {
-			color:crimson;
+		li.announce a {
+			color:#ff6a00;
 		}
 		.input-wrap {
 			position: relative;
@@ -809,6 +862,53 @@
 		ul#suggestion li:last-child {
 			margin-bottom:8px;
 		}
+		a.pclear {
+			width:40px;
+			height:40px;
+			line-height: 40px;
+			color:#999;
+			font-size: 24px;
+			text-align:center;
+			overflow: hidden;
+			text-decoration: none;
+			vertical-align: middle;
+			display: inline-block;
+			margin-left:-40px;
+		}
+		@media screen and (min-width:1291px){
+			div#courses-list {
+				position: fixed;
+				right: 0;
+				bottom: 0;
+				top: 0;
+				width: 27%;
+				background: #eee;
+				padding:20px;
+				overflow-x: hidden;
+				overflow-y: scroll;
+			}
+		}
+
+		li.announce a {
+			color:dodgerblue;
+			font-weight: bold;
+		}
+		#courses-list li a {
+			padding:10px;
+			-webkit-border-radius:3px;
+			border-radius:3px;
+			display: inline-block;
+			background: dodgerblue;
+			color:#fff;
+			text-decoration: none;
+			margin-top: 7px;
+			font-size: 14px;
+		}
+		#courses-list.active li a,
+		#courses-list.inactive li.inactive a {
+			display: none;
+		}
+
 	</style>
 
 </body>
