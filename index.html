@@ -10,20 +10,40 @@
 	<h2>課程表助手 Timetable Helper</h2>
 	<p>By K. C. Ho</p>
 
+	<p>&nbsp;</p>
+	<p>
+		<b>說明 / Instruction</b>
+	</p>
+	<ul class="inst">
+		<li>
+			輸入七位編號（如「EDPE101」）檢視該課程的所有課時，
+			<br>
+			Type 7-digit (e.g., "EDPE101") to view all section.
+		</li>
+		<li>
+			輸入完整編號（如「EDPE101 001」把該課程加到下方的「模擬課程表」中。
+			<br>
+			Full-digit (e.g., "EDPE101 001") for adding the course to the simulator below.
+		</li>
+	</ul>
+	<p>&nbsp;</p>
+
 	<form action="javascript:add()">
 		<p>
-			<label for="time">課程編號 Course Code</label>
+			<label for="time">
+				課程編號 Course Code
+			</label>
 			<div class="input-wrap">
-				<input type="search" id="coursename" placeholder="DROP101-015" autocomplete="off" onkeyup="getsuggestion()" onchange="getsuggestion()">
+				<input type="search" id="coursename" placeholder="EDPE101-001" autocomplete="off" onsearch="getsuggestion()" onkeyup="getsuggestion()">
 				<ul id="suggestion">
 				</ul>
 			</div>
-			<input type="submit" value="加入 Add">
+			<input type="submit" value="加入/檢視 Add/View">
 			<span id="error"></span>
 		</p>
 	</form>
 
-	<h4>課程表 Timetable</h4>
+	<h4>模擬課程表 Timetable Simulator</h4>
 	<p class="announce">重要聲明：下面列出的課程資訊可能已經過時，本工具之作者將不會對因閣下使用下述資料而產生的一切結果負任何責任，若要查閱最新資訊請參閱 <a href="http://isw.umac.mo">http://isw.umac.mo</a> !</p>
 	<a href="javascript:lockToggle()" id="lock">
 		<span id="lock-on">檢視模式<br><small>View Mode</small></span><span id="lock-off">修改模式<br><small>Edit Mode</small></span>
@@ -67,24 +87,17 @@
 	<script src="courses.js"></script>
 
 	<script>
-
 	var timetable = document.getElementById("timetable");
 	var template = timetable.innerHTML;
-
 	var courses = [
 	];
-
 	var allCourseMode = false;
-
 	var used_colors = {};
-
 	if(localStorage["coursesJson"]){
 		courses = JSON.parse(localStorage["coursesJson"]);
 	}
-
 	var totalHeight = 600;
 	var lineHeight = 12;
-
 	var dayName = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
 	var dayDisp = [
 		"星期日/Sun",
@@ -95,25 +108,18 @@
 		"星期五/Fri",
 		"星期六/Sat"
 	];
-
 	var errorDiv = document.getElementById("error");
 	var courseListDiv = document.getElementById("courselist");
-
 	var earliest = undefined;
 	var latest = undefined;
-
 	var heightOf1Min = 0;
-
 	var wrapper = document.getElementById("wrapper");
 	wrapper.style.height = (totalHeight + 60) + "px";
-
 	var hasUrlParam = false;
-
 	function changeValue(courseCode){
 		document.getElementById("coursename").value = courseCode;
 		return true;
 	}
-
 	var urlParam = window.location.search;
 	if(urlParam.indexOf("course=") > -1){
 		var courseCode_param = urlParam.substr(urlParam.indexOf("course=")+7, 7);
@@ -121,7 +127,6 @@
 		add(courseCode_param);
 		hasUrlParam = true;
 	}
-
 	function lockToggle(){
 		if(localStorage["lockMode"] && localStorage["lockMode"]==="lock"){
 			localStorage["lockMode"] = "unlock";
@@ -131,28 +136,20 @@
 		}
 		genIt()
 	}
-
 	function genIt(courses_list){
-
 //		courses = courses.sort(function(a,b){return a.code > b.code});
-
 		var used_colors_list = used_colors;
-
 		if(!courses_list){
 			courses_list = courses;
 			allCourseMode = false;
-
 		}
 		else{
 			allCourseMode = true;
-
 			for(var i=courses.length-1; i>=0; i--){
 				courses_list.unshift(courses[i]);
 			}
 		}
-
 		courseListDiv.innerHTML = "";
-
 		if(
 			allCourseMode===true ||
 			(localStorage["lockMode"] && localStorage["lockMode"]==="lock")
@@ -167,29 +164,21 @@
 			document.getElementById("lock").className = "unlock";
 			// document.getElementById("lock").innerHTML = "按此鎖定 Click to lock<br><small>鎖定課程表能避免誤刪課程<br>Lock to protect course(s) from removing.</small>";
 		}
-
 		earliest = undefined;
 		latest = undefined;
-
 		timetable.innerHTML = template;
-
 		document.getElementById("morning").style.height = 0 + "px";
 		document.getElementById("night").style.height = 0 + "px";
 		document.getElementById("afternoon").style.height = 0 + "px";
-
 		var day = document.querySelectorAll(".col");
-
 		for(var i=0; i<day.length; i++){
 			day[i].style.height = totalHeight + 'px';
 		}
-
 		for(var i=0; i<courses_list.length; i++){
 			var starttime = (parseInt(courses_list[i].start.substr(0,2)) * 60) + (parseInt(courses_list[i].start.substr(3,2)) * 1);
 			var endtime = (parseInt(courses_list[i].end.substr(0,2)) * 60) + (parseInt(courses_list[i].end.substr(3,2)) * 1);
-
 			courses_list[i].startStamp = starttime;
 			courses_list[i].endStamp   = endtime;
-
 			if(!earliest || earliest > starttime){
 				earliest = starttime;
 			}
@@ -197,7 +186,6 @@
 				latest = endtime;
 			}
 		}
-
 		if(earliest === undefined){
 			earliest = 11.5*60;
 			latest = 16.5*60;
@@ -209,7 +197,6 @@
 			if(latest < (18*60)){
 				latest += 30;
 			}
-
 			if(earliest > (12.5 * 60)){
 				earliest = (12.5 * 60);
 			}
@@ -217,63 +204,43 @@
 				latest = (15.5 * 60);
 			}
 		}
-
 		heightOf1Min = totalHeight / (latest - earliest);
-
 		for(var i=0; i<courses_list.length; i++){
-
 			var tmpLineHeight = lineHeight;
-
 			var weekday = dayName.indexOf(courses_list[i].day);
-
 			if(weekday > -1){
-
 				if(allCourseMode === true){
-
 					var basicHTML = "<small>" + courses_list[i].code + "<br><small>" + courses_list[i].start + "-" + courses_list[i].end + " @ " + courses_list[i].venue + "</small></small>";
 					var prevFound = false;
-
 					for(var k=0; k<i; k++){
 						if(
 							(courses_list[k].start === courses_list[i].start) &&
 							(courses_list[k].end === courses_list[i].end) &&
 							(courses_list[k].day === courses_list[i].day)
 						){
-
 							var div = document.getElementById(courses_list[k].code + "-" +courses_list[k].start + "-" +courses_list[k].end + "-" +courses_list[k].day);
 							div.innerHTML += "<hr>" + basicHTML;
 							prevFound = true;
 							break;
-
 						}
 					}
-
 					if(prevFound === true){
 						continue;
 					}
 				}
-
 				var div = document.createElement("a");
-
 				// if(allCourseMode === false){
 					div.href = "javascript:deleteIt('" + courses_list[i].code + "')";
 				// }
 				// else{
 				// 	div.href = "javascript:void(0)";
 				// }
-
 				div.style.top = ((courses_list[i].startStamp - earliest) * heightOf1Min) + "px";
-
 				var divHeight = ((courses_list[i].endStamp - courses_list[i].startStamp) * heightOf1Min - 12);
-
 				div.style.height = divHeight + "px";
-
 				var paddingTop = (divHeight - (tmpLineHeight*4)) / 2;
-
 				if(allCourseMode === false){
-
 					var basicHTML = courses_list[i].code + "<br><small><small>" + courses_list[i].name + "</small></small><br><small>" + courses_list[i].venue + "<br>" + courses_list[i].start + "-" + courses_list[i].end + "</small>";
-
 					if(paddingTop > 0){
 					 	div.innerHTML = basicHTML;
 					}
@@ -287,11 +254,8 @@
 					tmpLineHeight = 9;
 					var paddingTop = 7;
 					div.innerHTML = basicHTML;
-
 					div.id = courses_list[i].code + "-" +courses_list[i].start + "-" +courses_list[i].end + "-" +courses_list[i].day;
 				}
-
-
 				if(paddingTop > 0){
 					div.style.paddingTop = paddingTop + "px";
 					div.style.height = (divHeight - paddingTop) + "px";
@@ -299,24 +263,19 @@
 				else{
 					div.style.paddingTop = "0px";
 				}
-
 				var background = undefined;
-
 				if(used_colors_list[courses_list[i].code]){
 					background = used_colors_list[courses_list[i].code];
 				}
 				else if(allCourseMode === false){
 					for(var k=0; k<colors.length; k++){
-
 						var used = false;
-
 						for(var h in used_colors_list){
 							if(colors[k] === used_colors_list[h]){
 								used = true;
 								break;
 							}
 						}
-
 						if(used === false){
 							break;
 						}
@@ -324,69 +283,55 @@
 					background = colors[k];
 					used_colors_list[courses_list[i].code] = colors[k];
 				}
-
 				if(background === undefined){
 					background = "#cccccc";
 				}
-
 				div.style.borderColor = background;
 				div.style.lineHeight = tmpLineHeight + "px";
-
 				if(allCourseMode === false){
 					var span = document.createElement("span");
 					span.className = "cross";
 					span.innerHTML = "&times;";
 					span.style.height = tmpLineHeight + "px";
 					div.appendChild(span);
-
 					var span = document.createElement("span");
 					span.className = "alt-text";
 					span.innerHTML = courses_list[i].code;
 					span.style.height = tmpLineHeight + "px";
 					div.appendChild(span);
 				}
-
 				var bgDiv = document.createElement("div");
 				bgDiv.className = "background";
 				bgDiv.style.backgroundColor = background;
 				bgDiv.style.zIndex = -1;
-
 				// var altText = document.createElement("div");
 				// altText.className = "alt";
 				// altText.innerHTML = basicHTML;
 				div.appendChild(bgDiv);
 				// div.appendChild(altText);
-
 				day[weekday].appendChild(div);
 			}
 		}
-
 		var morning_height = 0;
 		var night_height = 0;
-
 		if(earliest < (13*60)){
 			morning_height = (13*60 - earliest);
 		}
 		if(latest > (18*60)){
 			night_height = (latest - 18*60);
 		}
-
 		if(morning_height < 1){
 			morning_height = 0;
 		}
 		else{
 			morning_height = morning_height * heightOf1Min + (lineHeight/2);
 		}
-
 		night_height = night_height * heightOf1Min - (lineHeight/2);
-
 		document.getElementById("morning").style.height = morning_height + "px";
 		document.getElementById("morning").style.lineHeight = morning_height + "px";
-
 		if(morning_height < 48){
 			document.getElementById("morning").style.lineHeight = 1 + "px";
 		}
-
 		if(night_height < 30){
 			night_height = 0;
 		}
@@ -395,34 +340,26 @@
 		
 		var afternoon_height = totalHeight - night_height - morning_height;
 		morning_height += 35;
-
 		document.getElementById("afternoon").style.top = morning_height + "px";
 		document.getElementById("afternoon").style.height = afternoon_height + "px";
 		document.getElementById("afternoon").style.lineHeight = afternoon_height + "px";
-
 		for(var i=earliest; i<latest; i+=30){
 			var stampTop = ((i - earliest) * heightOf1Min - (lineHeight/2));
-
 			var stamp = document.createElement("div");
 			stamp.style.height = (heightOf1Min * 30) + "px";
 			stamp.style.top = stampTop + "px";
-
 			var hour = parseInt(i/60);
 			var min = (i - (hour*60));
-
 			if(min < 10){
 				min = '0' + min;
 			}
 			stamp.innerHTML = hour + ":" + min;
 			day[0].appendChild(stamp);
 		}
-
 		var previousCourse = "";
-
 		for(var i=0; i<courses_list.length; i++){
 			if(courses_list[i].code !== previousCourse){
 				previousCourse = courses_list[i].code;
-
 				var li = document.createElement("li");
 				li.innerHTML = "<h3>" + courses_list[i].code + "</h3>" +
 								"<p>" + courses_list[i].name + "</p>" +
@@ -434,36 +371,28 @@
 								((courses_list[i].remark.replace(/\s/g, "")==="")
 									? ""
 									: "<p><u>備註 Remark</u><br>" + courses_list[i].remark.replace(/\n/g, "<br>") + "</p>");
-
 				if(allCourseMode===true){
 					if(i < courses.length){
 						li.className = "inactive";
 					}
 				}
-
 //				courseListDiv.insertBefore(li, courseListDiv.querySelector("li"));
 				courseListDiv.appendChild(li);
 			}
-
 			var dayIndex = dayName.indexOf(courses_list[i].day);
-
 			if(dayIndex > -1){
 				ul = document.getElementById(courses_list[i].code);
 				ul.innerHTML += "<li>" + "<b>" + dayDisp[dayIndex] + " - " + courses_list[i].start + "-" + courses_list[i].end + "</b><br>" + courses_list[i].venue + " (" + courses_list[i].type + ")" + "</li>";
 			}
 		}
-
 		if(allCourseMode === false){
 			localStorage["coursesJson"] = JSON.stringify(courses_list);
 			used_colors = used_colors_list;
 		}
 		return true;
 	}
-
 	function look(coursecode){
-
 		var courses_list_tmp = [];
-
 		for(var i=0; i<courses_info.length; i++){
 			if(courses_info[i].code.substr(0,7) === coursecode){
 				courses_list_tmp.push(courses_info[i]);
@@ -477,9 +406,7 @@
 			genIt(courses_list_tmp);
 		}
 	}
-
 	function add(coursecode){
-
 		if(!coursecode){
 			var code_raw = document.getElementById("coursename").value;
 		}
@@ -487,29 +414,23 @@
 			var code_raw = coursecode;
 		}
 		code_raw = code_raw.replace(/ /g, "").toUpperCase();
-
 		if(code_raw.length < 8){
 			look(code_raw);
 			return;
 		}
-
 		var code = code_raw.substr(0,7) + "-" + code_raw.substr(-3);
 		var existed = false;
-
 		for(var i=0; i<courses.length; i++){
 			if(courses[i].code === code){
 				existed = true;
 				break;
 			}
 		}
-
 		if(existed === true){
 			errorDiv.innerHTML = "課程已在課程表中";
 			return genIt();
 		}
-
 		errorDiv.innerHTML = "";
-
 		var count = 0;
 		for(var i=0; i<courses_info.length; i++){
 			if(courses_info[i].code === code){
@@ -517,7 +438,6 @@
 				count++;
 			}
 		}
-
 		if(count === 0){
 			errorDiv.innerHTML = "課程不存在";
 		}
@@ -525,11 +445,8 @@
 			errorDiv.innerHTML = "";
 			document.getElementById("coursename").value = "";
 		}
-
 		genIt()
 	}
-
-
 	function deleteIt(courseCode){
 		for(var i=courses.length-1; i>=0; i--){
 			if(courses[i].code === courseCode){
@@ -539,52 +456,37 @@
 		used_colors[courseCode] = undefined;
 		genIt();
 	}
-
 	if(hasUrlParam === false){
 		genIt();
 	}
-
 	var timeout = undefined;
-
 	function fetchIt(){
-
 		var input = document.getElementById("coursename").value;
 		input = input.replace(/ /g, "").toUpperCase();
-
 		document.getElementById("suggestion").innerHTML = "";
-
 		if(input.length < 3){
 			return false;
 		}
-
 		var added = [];
-
 		for(var i=0; i<courses_info.length; i++){
 			if(input === courses_info[i].code.substr(0, input.length)){
-
 				var coursecode = courses_info[i].code.substr(0, 7);
-
 				if(added.indexOf(coursecode) === -1){
-
 					var li = document.createElement("li");
 					var a = document.createElement("a");
 					a.innerHTML = "<b>" + coursecode + "</b><br>" + courses_info[i].name + "</a>";
 					a.href = "javascript:add('" + coursecode + "')";
 					li.appendChild(a);
 					document.getElementById("suggestion").appendChild(li);
-
 					added.push(coursecode);
 				}
 			}
 		}
 	}
-
 	function getsuggestion(){
-
 		if(timeout !== undefined){
 			window.clearInterval(timeout);
 		}
-
 		timeout = window.setTimeout(function(){
 			fetchIt();
 		}, 300);
@@ -606,6 +508,10 @@
 		}
 		li {
 			padding:15px 0;
+		}
+		ul.inst li {
+			padding:10px 0 0 0;
+			font-size: 13px;
 		}
 		li.inactive {
 			color:#aaa;
@@ -724,7 +630,7 @@
 		label {
 			font-size: 13px;
 		}
-		input[type="text"]{
+		input[type="search"]{
 			font-size:16px;
 			padding:5px;
 			border:1px solid #ddd;
@@ -732,7 +638,10 @@
 			border-radius:3px;
 			outline:0;
 		}
-		input[type="text"]:focus {
+		input[type="search"]:hover {
+			border-color:#999;
+		}
+		input[type="search"]:focus {
 			border-color:#0089ff;
 		}
 		input[type="submit"]{
@@ -743,6 +652,10 @@
 			border:0;
 			-webkit-border-radius:3px;
 			border-radius:3px;
+			cursor: pointer;
+		}
+		input[type="submit"]:hover{
+			background:#000;
 		}
 		#error {
 			color:crimson;
@@ -846,7 +759,6 @@
 		p.announce a {
 			color:crimson;
 		}
-
 		.input-wrap {
 			position: relative;
 			display: inline-block;
@@ -883,7 +795,7 @@
 			text-transform: lowercase;
 		}
 		ul#suggestion li a:hover {
-			background:#eee;
+			background:#f1f1f1;
 		}
 		ul#suggestion li a b {
 			font-size:14px;
