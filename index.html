@@ -6,11 +6,6 @@
 	<title>課程表助手 Timetable Helper</title>
 </head>
 <body>
-
-	<h2>課程表助手 Timetable Helper</h2>
-	<p>By K. C. Ho</p>
-
-	<p>&nbsp;</p>
 	<p>
 		<b>說明 / Instruction</b>
 	</p>
@@ -26,11 +21,16 @@
 			Full-digit (e.g., "EDPE101 001") for adding the course to the simulator below.
 		</li>
 		<li>
-			部份 FST 課堂區分 Lab A 及 Lab B，在本表中將以 X 及 Y 區分，唯實際情況下，該課時編號應為「001/LAB-LXX」。
+			部份 FST 課堂區分 Lab A 及 Lab B，在本表中將以 A 及 B 區分，唯實際情況下，該課時編號應為「001/LAB-LXX」。
 			<br>
-			Some courses for FST are divided two labs. "X" and "Y" are used below, while the real situation should be "001/LAB-LXX".
+			Some courses for FST are divided two labs. "A" and "B" are used below, while the real situation should be "001/LAB-LXX".
 		</li>
 	</ul>
+	<hr class="full">
+
+	<h2>課程表助手 Timetable Helper</h2>
+	<p>By K. C. Ho</p>
+
 	<p>&nbsp;</p>
 
 	<form action="javascript:add()">
@@ -38,6 +38,7 @@
 			<label for="time">
 				課程編號 Course Code
 			</label>
+			<span id="error"></span>
 			<div class="input-wrap">
 				<input type="text" id="coursename" placeholder="EDPE101-001" autocomplete="off" onkeyup="getsuggestion()">
 				<a href="javascript:clear_input()" class="pclear">&times;</a>
@@ -45,7 +46,6 @@
 				</ul>
 			</div>
 			<input type="submit" value="加入/檢視 Add/View">
-			<span id="error"></span>
 		</p>
 	</form>
 
@@ -93,12 +93,19 @@
 
 	<div id="courses-list">
 	<h4>課程 Courses</h4>
+
+	<div id="umacinfo"></div>
+
 	<ul id="courselist">
 
 	</ul>
 	</div>
 
 	<script src="courses.js"></script>
+<!--	<script
+	src="https://code.jquery.com/jquery-3.2.1.min.js"
+	integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+	crossorigin="anonymous"></script>-->
 
 	<script>
 	var timetable = document.getElementById("timetable");
@@ -130,6 +137,16 @@
 	var wrapper = document.getElementById("wrapper");
 	wrapper.style.height = (totalHeight + 60) + "px";
 	var hasUrlParam = false;
+
+	Object.size = function(obj) {
+		var size = 0, key;
+		for (key in obj) {
+			if(obj[key] !== undefined){
+				size++;
+			}
+		}
+		return size;
+	};
 	function changeValue(courseCode){
 		document.getElementById("coursename").value = courseCode;
 		return true;
@@ -376,11 +393,30 @@
 			day[0].appendChild(stamp);
 		}
 		var previousCourse = "";
-		for(var i=0; i<courses_list.length; i++){
+/*
+		if(allCourseMode===true){
+			var div_umacinfo = document.getElementById("umacinfo");
+			div_umacinfo.className = "";
+			div_umacinfo.innerHTML = "";
+
+			var ccode = document.getElementById("coursename").value;
+
+			$(document).ready(function() {
+				$.get(
+					"https://umac.info/database/main/course_grade/" + ccode,
+					function(data){
+						div_umacinfo.className = "umac-info";
+						div_umacinfo.innerHTML = data.replace(/style="[^"]*"/g, "");
+					}
+				);
+			});
+		}
+*/
+		for(var i=courses_list.length-1; i>=0; i--){
 			if(courses_list[i].code !== previousCourse){
 				previousCourse = courses_list[i].code;
 				var li = document.createElement("li");
-				li.innerHTML = "<h3>" + courses_list[i].code + "</h3>" +
+				li.innerHTML = '<h3><span style="background:' + used_colors_list[courses_list[i].code] + '"></span>' + courses_list[i].code + "</h3>" +
 								"<p>" + courses_list[i].name + "</p>" +
 								"<p><u>上課時間及地點 Time & Venue</u></p>" +
 								"<ul id='" + courses_list[i].code + "'></ul>" + 
@@ -390,7 +426,7 @@
 								((courses_list[i].remark.replace(/\s/g, "")==="")
 									? ""
 									: "<p><u>備註 Remark</u><br>" + courses_list[i].remark.replace(/\n/g, "<br>") + "</p>") +
-								'<a href="javascript:add(\'' +courses_list[i].code+ '\')">加入 Add</a>';
+								'<a href="javascript:add(\'' +courses_list[i].code+ '\')" class="add">加入 Add</a><a href="javascript:deleteIt(\'' +courses_list[i].code+ '\')" class="del">刪除 Delete</a>';
 				if(allCourseMode===true){
 					if(i < courses.length){
 						li.className = "inactive";
@@ -401,8 +437,36 @@
 			}
 			var dayIndex = dayName.indexOf(courses_list[i].day);
 			if(dayIndex > -1){
-				ul = document.getElementById(courses_list[i].code);
-				ul.innerHTML += "<li>" + "<b>" + dayDisp[dayIndex] + " - " + courses_list[i].start + "-" + courses_list[i].end + "</b><br>" + courses_list[i].venue + " (" + courses_list[i].type + ")" + "</li>";
+
+				var ths = courses_list[i];
+
+				ul = document.getElementById(ths.code);
+
+				var li_el = document.createElement("li");
+
+				li_el.innerHTML += "<b>" + dayDisp[dayIndex] + " - " + courses_list[i].start + "-" + courses_list[i].end + "</b><br>" + courses_list[i].venue + " (" + courses_list[i].type + ")";
+
+				// console.log(ths.code);
+
+				for(var ix in courses){
+
+					var oppose = courses[ix];
+
+					if(
+						oppose.code !== ths.code
+						&& oppose.day === ths.day
+						&& (
+							(oppose.startStamp <= ths.startStamp && oppose.endStamp >= ths.startStamp)
+							|| (oppose.startStamp <= ths.endStamp && oppose.endStamp >= ths.endStamp)
+							|| (oppose.startStamp >= ths.startStamp && oppose.endStamp <= ths.endStamp)
+						)
+					){
+						li_el.innerHTML += "<br><span class=\"warning\">與" + oppose.code + "衝突</span>";
+					}
+					// console.log(oppose.code, ths.code);
+				}
+
+				ul.appendChild(li_el);
 			}
 		}
 		if(allCourseMode === false){
@@ -411,7 +475,7 @@
 		}
 		return true;
 	}
-	function look(coursecode){
+	function look(coursecode, is_error){
 		var courses_list_tmp = [];
 		for(var i=0; i<courses_info.length; i++){
 			if(courses_info[i].code.substr(0,7) === coursecode){
@@ -419,14 +483,26 @@
 			}
 		}
 		if(courses_list_tmp.length < 1){
-			errorDiv.innerHTML = "課程不存在";
+			errorDiv.innerHTML = "<span>課程不存在</span>";
 		}
 		else{
-			errorDiv.innerHTML = "";
+
+			if(is_error && is_error===true){
+				errorDiv.innerHTML = "<span>請選擇一個Section</span>";
+			}
+			else{
+				errorDiv.innerHTML = "";
+			}
 			genIt(courses_list_tmp);
 		}
 	}
 	function add(coursecode){
+
+		if(Object.size(used_colors) >= colors.length){
+			errorDiv.innerHTML = "<span>請先刪除一些科目再繼續</span>";
+			document.getElementById("suggestion").innerHTML = "";
+			return;
+		}
 
 		document.getElementById("suggestion").innerHTML = "";
 
@@ -453,7 +529,7 @@
 			}
 		}
 		if(existed === true){
-			errorDiv.innerHTML = "課程已在課程表中";
+			errorDiv.innerHTML = "<span>課程已在課程表中</span>";
 			return genIt();
 		}
 		errorDiv.innerHTML = "";
@@ -465,7 +541,7 @@
 			}
 		}
 		if(count === 0){
-			return look(code_raw.substr(0,7));
+			return look(code_raw.substr(0,7), true);
 		}
 		else{
 			errorDiv.innerHTML = "";
@@ -712,9 +788,13 @@
 		}
 		#error {
 			color:crimson;
-			font-size:14px;
-			padding-left:10px;
-			display: inline-block;
+			font-size:16px;
+			display: block;
+			font-weight: bold;
+		}
+		#error span {
+			padding: 10px 0 3px 0;
+			display: block;
 		}
 		a#lock {
 			display: block;
@@ -803,6 +883,11 @@
 			border-top:1px dotted #000;
 			padding:0;
 			margin:3px;
+			display: block;
+		}
+		hr.full {
+			margin:25px -5px;
+			border-top:1px solid #ccc;
 		}
 		li.announce {
 			padding:5px 0;
@@ -881,11 +966,14 @@
 				right: 0;
 				bottom: 0;
 				top: 0;
-				width: 27%;
+				left: 72%;
 				background: #eee;
 				padding:20px;
 				overflow-x: hidden;
 				overflow-y: scroll;
+			}
+			body {
+				margin-right: 28%;
 			}
 		}
 
@@ -903,12 +991,103 @@
 			text-decoration: none;
 			margin-top: 7px;
 			font-size: 14px;
+			height: 18px;
 		}
-		#courses-list.active li a,
-		#courses-list.inactive li.inactive a {
+		#courses-list li a:before {
+			font-size: 30px;
+			display: inline-block;
+			vertical-align: top;
+			padding-right: 3px;
+			margin-top: -7px;
+		}
+		#courses-list li a.del {
+			background: #ffdada;
+			color: #ff8080;
+		}
+		#courses-list li a.del:hover {
+			background: #ffc9c9;
+		}
+		#courses-list li a.del:before {
+			content:'\d7';
+		}
+		#courses-list li a.add:hover {
+			background: #0282ff;
+		}
+		#courses-list li a.add:before {
+			content:'+';
+		}
+		#courses-list.active li a.add,
+		#courses-list.inactive li.inactive a.add,
+		#courses-list.inactive li a.del {
 			display: none;
 		}
-
+		#courses-list.inactive li.inactive a.del {
+			display: inline-block;
+		}
+		ul#courselist {
+			padding-left: 0;
+		}
+		ul#courselist > li {
+			list-style: none;
+			padding-left: 20px;
+			position: relative;
+		}
+		ul#courselist > li > h3 > span {
+			-webkit-border-radius:3px;
+			border-radius:3px;
+			width:10px;
+			height:35px;
+			display: inline-block;
+			position: absolute;
+			left:5px;
+			vertical-align: middle;
+		}
+		ul#courselist > li > h3 + p {
+			padding-top: 3px;
+		}
+		#courses-list span.warning {
+			margin:2px 0 0 0;
+			-webkit-border-radius:2px;
+			border-radius:2px;
+			background: bisque;
+			color:peru;
+			display: inline-block;
+			padding:3px;
+		}
+		.umac-info {
+			display: block;
+			padding: 0 13px 13px;
+			background: #ccc;
+			color:#666;
+			-webkit-border-radius:3px;
+			border-radius:3px;
+			overflow: hidden;
+			margin: 10px 0;
+		}
+		.umac-info .header {
+			font-size: 13px;
+			padding:10px 13px 8px;
+			background: #222;
+			color:#fff;
+			margin-left: -13px;
+			margin-right: -13px;
+		}
+		.umac-info .row.well,
+		.umac-info .col-md-4,
+		.umac-info .panel-collapse {
+			display: none;
+		}
+		.umac-info a {
+			color: #333;
+			text-decoration: none;
+			cursor: default;
+			font-size: 16px;
+			padding-top: 10px;
+			display: block;
+		}
+		.umac-info a .pull-right {
+			float: right;
+		}
 	</style>
 
 </body>
