@@ -14,7 +14,7 @@
 		<p>
 			<label for="time">課程編號 Course Code</label>
 			<div class="input-wrap">
-				<input type="text" id="coursename" placeholder="DROP101-015" autocomplete="off" onkeyup="getsuggestion()">
+				<input type="search" id="coursename" placeholder="DROP101-015" autocomplete="off" onkeyup="getsuggestion()" onchange="getsuggestion()">
 				<ul id="suggestion">
 				</ul>
 			</div>
@@ -868,24 +868,31 @@
 		ul#suggestion li {
 			display: block;
 			margin:3px 3px 0 3px;
-			background: #fff;
-			padding:10px;
+			padding:0;
 		}
 		ul#suggestion li a {
+			background: #fff;
 			display: block;
 			text-decoration: none;
 			font-size:12px;
-			padding:0;
+			padding:10px;
 			overflow: hidden;
 			white-space: nowrap;
 			text-overflow: ellipsis;
 			color:#999;
 			text-transform: lowercase;
 		}
+		ul#suggestion li a:hover {
+			background:#eee;
+		}
 		ul#suggestion li a b {
 			font-size:14px;
 			font-weight: normal;
 			color:#222;
+		}
+		ul#suggestion li a:hover b {
+			font-weight:bold;
+			color:#444;
 		}
 		ul#suggestion li:last-child {
 			margin-bottom:8px;
