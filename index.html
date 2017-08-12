@@ -5,21 +5,11 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>課程表助手 Timetable Helper</title>
 </head>
-<body>
+<body id="body">
 	<p>
-		<b>說明 / Instruction</b>
+		<b>備註 / Note</b>
 	</p>
 	<ul class="inst">
-		<li>
-			輸入七位編號（如「EDPE101」）檢視該課程的所有課時，
-			<br>
-			Type 7-digit (e.g., "EDPE101") to view all section.
-		</li>
-		<li>
-			輸入完整編號（如「EDPE101 001」把該課程加到下方的「模擬課程表」中。
-			<br>
-			Full-digit (e.g., "EDPE101 001") for adding the course to the simulator below.
-		</li>
 		<li>
 			部份 FST 課堂區分 Lab A 及 Lab B，在本表中將以 A 及 B 區分，唯實際情況下，該課時編號應為「001/LAB-LXX」。
 			<br>
@@ -33,20 +23,22 @@
 
 	<p>&nbsp;</p>
 
-	<form action="javascript:add()">
+	<form action="javascript:add()" id="table-top">
 		<p>
 			<label for="time">
 				課程編號 Course Code
 			</label>
 			<span id="error"></span>
 			<div class="input-wrap">
-				<input type="text" id="coursename" placeholder="EDPE101-001" autocomplete="off" onkeyup="getsuggestion()">
+				<input type="text" id="coursename" placeholder="EDPE101" autocomplete="off" onkeyup="getsuggestion()">
 				<a href="javascript:clear_input()" class="pclear">&times;</a>
 				<ul id="suggestion">
 				</ul>
 			</div>
 			<input type="submit" value="加入/檢視 Add/View">
 		</p>
+
+		<p><small>&gt; 看一看右上方吧 那裡可以快速切換功能喔~</small></p>
 	</form>
 
 	<h4>模擬課程表 Timetable Simulator</h4>
@@ -60,6 +52,11 @@
 	<a href="javascript:lockToggle()" id="lock">
 		<span id="lock-on">檢視模式<br><small>View Mode</small></span><span id="lock-off">修改模式<br><small>Edit Mode</small></span>
 	</a>
+	<a href="javascript:lockScrollToggle()" id="scroll-lock">
+		<span>鎖定/解鎖畫面滾軸<br><small>Lock/Unlock Screen</small></span>
+	</a>
+
+	<p class="max-only alink"><a href="#courseheader">往下滾動以查看課程詳細資料</a></p>
 
 	<div id="wrapper">
 		<div id="overlay"></div>
@@ -89,16 +86,50 @@
 		</div>
 	</div>
 
-	<p>&nbsp;</p>
+	<p class="br">
+		Jump to Section
+		<a href="#table-top">Timetable</a>
+		<a href="#courseheader">Courses Detail</a>
+		<a href="#study-plan" id="studyplan-link">Available Courses List</a>
+		<a href="#isw-form">Import</a>
+	</p>
 
 	<div id="courses-list">
-	<h4>課程 Courses</h4>
+		<h4 id="courseheader">課程 Courses</h4>
+		<p class="max-only"><small>&gt; 看一看右上方吧 那裡可以快速切換功能喔~</small></p>
 
-	<div id="umacinfo"></div>
+		<div id="umacinfo"></div>
 
-	<ul id="courselist">
+		<ul id="courselist">
+		</ul>
 
-	</ul>
+		<div id="study-plan"></div>
+
+		<hr class="full">
+
+		<form action="javascript:addIsw()" id="isw-form">
+			<p>
+				<b>匯入模擬課程表 Import Timetable</b>
+				<br>&nbsp;
+			</p>
+			<p class="max-only">
+				&gt; 看一看右上方吧 那裡可以快速切換功能喔~
+				<br>&nbsp;
+			</p>
+			<p>
+				把 <a href="https://isw.umac.mo/siweb/">https://isw.umac.mo/siweb</a> 中的 Timetable 或 Study Plan 的所有文字都複製到下面，以生成課程表
+				<br>
+				Copy all the text from "Timetable" or "Study Plan" in <a href="https://isw.umac.mo/siweb/">https://isw.umac.mo/siweb</a> and paste it below. A timetable will be generated for you.
+				<br>&nbsp;
+				<br>適用於 / Applicable for
+				<br><strong>Timetable</strong> & <strong>Study Plan</strong>
+				<br>&nbsp;
+				<br>若要複製 Study Plan，請先在 ISW > Study Plan 的右上切換至 Print 模式，再複製。
+				<br>Before copying study plan, switch to "Print" mode (at right-top corner) at ISW > Study Plan first.
+			</p>
+			<textarea id="isw"></textarea>
+			<input type="submit" value="匯入 Import">
+		</form>
 	</div>
 
 	<script src="courses.js"></script>
@@ -147,6 +178,20 @@
 		}
 		return size;
 	};
+
+	var studyPlanDiv = document.getElementById("study-plan");
+	var studyPlanLink = document.getElementById("studyplan-link");
+	studyPlanLink.style.display = "none";
+
+	function lockScrollToggle(){
+		var body = document.getElementById("body");
+		if(body.className === ""){
+			body.className = "lockScreen";
+		}
+		else{
+			body.className = "";
+		}
+	}
 	function changeValue(courseCode){
 		document.getElementById("coursename").value = courseCode;
 		return true;
@@ -168,6 +213,10 @@
 		genIt()
 	}
 	function genIt(courses_list){
+
+		window.scrollTo(0,document.getElementById("table-top").offsetTop);
+		document.getElementById("courses-list").scrollTop = 0;
+
 //		courses = courses.sort(function(a,b){return a.code > b.code});
 		var used_colors_list = used_colors;
 		if(!courses_list){
@@ -439,34 +488,39 @@
 			if(dayIndex > -1){
 
 				var ths = courses_list[i];
+				var ths_id = ths.code + '-' + ths.day + '-' + ths.startStamp + '-' + ths.endStamp;
 
-				ul = document.getElementById(ths.code);
+	if(!document.getElementById(ths_id)){
 
-				var li_el = document.createElement("li");
+		ul = document.getElementById(ths.code);
 
-				li_el.innerHTML += "<b>" + dayDisp[dayIndex] + " - " + courses_list[i].start + "-" + courses_list[i].end + "</b><br>" + courses_list[i].venue + " (" + courses_list[i].type + ")";
+		var li_el = document.createElement("li");
+		li_el.id = ths_id;
 
-				// console.log(ths.code);
+		li_el.innerHTML += "<b>" + dayDisp[dayIndex] + " - " + ths.start + "-" + ths.end + "</b><br>" + ths.venue + " (" + ths.type + ")";
 
-				for(var ix in courses){
+		// console.log(ths.code);
 
-					var oppose = courses[ix];
+		for(var ix in courses){
 
-					if(
-						oppose.code !== ths.code
-						&& oppose.day === ths.day
-						&& (
-							(oppose.startStamp <= ths.startStamp && oppose.endStamp >= ths.startStamp)
-							|| (oppose.startStamp <= ths.endStamp && oppose.endStamp >= ths.endStamp)
-							|| (oppose.startStamp >= ths.startStamp && oppose.endStamp <= ths.endStamp)
-						)
-					){
-						li_el.innerHTML += "<br><span class=\"warning\">與" + oppose.code + "衝突</span>";
-					}
-					// console.log(oppose.code, ths.code);
-				}
+			var oppose = courses[ix];
 
-				ul.appendChild(li_el);
+			if(
+				oppose.code !== ths.code
+				&& oppose.day === ths.day
+				&& (
+					(oppose.startStamp <= ths.startStamp && oppose.endStamp >= ths.startStamp)
+					|| (oppose.startStamp <= ths.endStamp && oppose.endStamp >= ths.endStamp)
+					|| (oppose.startStamp >= ths.startStamp && oppose.endStamp <= ths.endStamp)
+				)
+			){
+				li_el.innerHTML += "<br><span class=\"warning\">與" + oppose.code + "衝突</span>";
+			}
+			// console.log(oppose.code, ths.code);
+		}
+
+		ul.appendChild(li_el);
+	}
 			}
 		}
 		if(allCourseMode === false){
@@ -475,7 +529,34 @@
 		}
 		return true;
 	}
-	function look(coursecode, is_error){
+	function print_error(msg, code){
+		
+		var span_id_str = " class='others'";
+		if(code){
+			span_id_str = ' class="'+code+'"';
+		}
+
+		if(errorDiv.innerHTML.indexOf(msg) === -1){
+			errorDiv.innerHTML += "<span" + span_id_str + ">" + msg + "</span>";
+		}
+	}
+	function removeError(code){
+
+		// remove specific error.
+		if(code){
+			var er = document.querySelectorAll("." + code);
+			for(var el=0; el<er.length; el++){
+				errorDiv.removeChild(er[el]);
+			}
+		}
+
+		// remove other error => keep COURSE ERROR.
+		var er = document.querySelectorAll(".others");
+		for(var el=0; el<er.lenth; el++){
+			errorDiv.removeChild(er[el]);
+		}
+	}
+	function look(coursecode, is_error, is_importing){
 		var courses_list_tmp = [];
 		for(var i=0; i<courses_info.length; i++){
 			if(courses_info[i].code.substr(0,7) === coursecode){
@@ -483,29 +564,41 @@
 			}
 		}
 		if(courses_list_tmp.length < 1){
-			errorDiv.innerHTML = "<span>課程不存在</span>";
+			print_error(coursecode+": 課程不存在");
 		}
 		else{
 
-			if(is_error && is_error===true){
-				errorDiv.innerHTML = "<span>請選擇一個Section</span>";
+			if(is_importing && is_importing===true){
+				
+				if(is_error && is_error===true){
+					print_error(coursecode+": 該課程有兩個Lab，請在下方輸入課程編號並手動選擇", coursecode);
+				}
 			}
 			else{
-				errorDiv.innerHTML = "";
+				if(is_error && is_error===true){
+					print_error(coursecode+": 請選擇一個Section", coursecode);
+				}
+				else{
+					removeError(coursecode);
+				}
 			}
 			genIt(courses_list_tmp);
 		}
 	}
-	function add(coursecode){
+	function add(coursecode, is_importing){
 
-		if(Object.size(used_colors) >= colors.length){
-			errorDiv.innerHTML = "<span>請先刪除一些科目再繼續</span>";
-			document.getElementById("suggestion").innerHTML = "";
-			return;
+		if(!(is_importing && is_importing===true)){
+			is_importing = false;
+			removeError();
+			removeError();
 		}
 
 		document.getElementById("suggestion").innerHTML = "";
 
+		if(Object.size(used_colors) >= colors.length){
+			print_error("請先刪除一些科目再繼續");
+			return;
+		}
 		if(!coursecode){
 			var code_raw = document.getElementById("coursename").value;
 		}
@@ -517,7 +610,7 @@
 		document.getElementById("coursename").value = code_raw;
 
 		if(code_raw.length < 8){
-			look(code_raw);
+			look(code_raw, null, is_importing);
 			return;
 		}
 		var code = code_raw.substr(0,7) + "-" + code_raw.substr(-3);
@@ -529,10 +622,12 @@
 			}
 		}
 		if(existed === true){
-			errorDiv.innerHTML = "<span>課程已在課程表中</span>";
+
+			if(is_importing===false){
+				print_error(code_raw+": 課程已在課程表中");
+			}
 			return genIt();
 		}
-		errorDiv.innerHTML = "";
 		var count = 0;
 		for(var i=0; i<courses_info.length; i++){
 			if(courses_info[i].code === code){
@@ -541,10 +636,13 @@
 			}
 		}
 		if(count === 0){
-			return look(code_raw.substr(0,7), true);
+			return look(code_raw.substr(0,7), true, is_importing);
 		}
 		else{
-			errorDiv.innerHTML = "";
+
+			if(is_importing===false){
+				removeError();
+			}
 			document.getElementById("coursename").value = "";
 			localStorage["lockMode"] = "unlock";
 		}
@@ -598,6 +696,67 @@
 		timeout = window.setTimeout(function(){
 			fetchIt();
 		}, 300);
+	}
+	function addIsw(){
+
+		removeError();
+
+		var content = document.getElementById("isw").value;
+		var im_courses = content.match(/[A-Za-z]{4}[0-9]{3}( )?(\([0-9]{3}\))?/g);
+
+		if(im_courses.length > 40){
+
+			var im_courses_detail = content.match(/[A-Za-z]{4}[0-9]{3}[^\n]*/g);
+
+			studyPlanLink.style.display = "block";
+			studyPlanDiv.innerHTML = "<hr class='full'><p><b>可選擇的課程列表 Available Courses List</b></p><p class='max-only'><small>&gt; 看一看右上方吧 那裡可以快速切換功能喔~</small><br>&nbsp;</p>";
+
+			for(var i=im_courses.length-1; i>=0; i--){
+				if(im_courses.indexOf(im_courses[i]) < i){
+					im_courses.splice(i, 1);
+				}
+				else if(
+					im_courses_detail[i].indexOf(")Completed")!==-1
+					|| im_courses_detail[i].indexOf(")In Progress")!==-1
+				){
+					im_courses.splice(i, 1);
+				}
+				else{
+					var cs_found = false;
+					for(var ci=0; ci<courses_info.length; ci++){
+						if(courses_info[ci].code.substr(0,7) === im_courses[i]){
+							cs_found = true;
+							break;
+						}
+					}
+
+					if(cs_found===false){
+						im_courses.splice(i,1);
+					}
+					else{
+						im_courses[i] = {
+							code: im_courses[i],
+							text: im_courses_detail[i].substr(7)
+						};
+					}
+				}
+			}
+
+			for(var i=0; i<im_courses.length; i++){
+				var p = document.createElement("p");
+				p.innerHTML = '<a href="javascript:add(\'' + im_courses[i].code + '\')">' + 
+					'<b>' + im_courses[i].code + '</b><br>' + im_courses[i].text + '</a>';
+
+				studyPlanDiv.appendChild(p);
+			}
+		}
+		else{
+
+			for(var i=0; i<im_courses.length; i++){
+				add(im_courses[i].replace(/[\(\)]/g,""), true);
+			}
+		}
+
 	}
 
 	function find_multi_lab(){
@@ -756,10 +915,11 @@
 			border:0;
 			color:#aaa;
 		}
-		label {
+		label, form p {
 			font-size: 13px;
 		}
-		input[type="text"]{
+		input[type="text"],
+		textarea {
 			font-size:16px;
 			padding:5px;
 			border:1px solid #ddd;
@@ -767,24 +927,41 @@
 			border-radius:3px;
 			outline:0;
 		}
-		input[type="text"]:hover {
+		textarea {
+			overflow: hidden;
+		}
+		input[type="text"]:hover,
+		textarea:hover  {
 			border-color:#999;
 		}
-		input[type="text"]:focus {
+		input[type="text"]:focus,
+		textarea:focus  {
 			border-color:#0089ff;
+		}
+		#isw-form textarea {
+			width:100%;
+			height:250px;
 		}
 		input[type="submit"]{
 			padding:7px 12px;
 			outline:0;
-			background:#222;
-			color:#fff;
+			background:#ddd;
+			color:#444;
 			border:0;
 			-webkit-border-radius:3px;
 			border-radius:3px;
 			cursor: pointer;
 		}
 		input[type="submit"]:hover{
-			background:#000;
+			background:#ccc;
+			color:#222;
+		}
+		#isw-form input[type="submit"] {
+			background: darkturquoise;
+			color:#fff;
+		}
+		#isw-form input[type="submit"]:hover {
+			background: #00c7ca;
 		}
 		#error {
 			color:crimson;
@@ -796,7 +973,7 @@
 			padding: 10px 0 3px 0;
 			display: block;
 		}
-		a#lock {
+		a#lock, a#scroll-lock {
 			display: block;
 			text-align: center;
 			height:48px;
@@ -811,13 +988,30 @@
 			width:140px;
 			position: relative;
 		}
-		a#lock span {
+		a#scroll-lock {
+			color:#fff;
+			background: dodgerblue;
+			position: fixed;
+			right: 28%;
+			margin: 10px 10px 0 0;
+			top:0;
+			width: 150px;
+		}
+		a#scroll-lock:hover {
+			background: #0678e6;
+		}
+		a#lock span,
+		a#scroll-lock span {
 			position: absolute;
 			padding:10px 0 0;
 			height:100px;
 			overflow: hidden;
 			-webkit-transition: left 0.2s ease-out, right 0.2s ease-out, background 0.2s ease-out;
 			transition: left 0.2s ease-out, right 0.2s ease-out, background 0.2s ease-out;
+		}
+		a#scroll-lock span {
+			width: 100%;
+			left:0;
 		}
 		a #lock-off {
 			left:0;
@@ -960,6 +1154,15 @@
 			display: inline-block;
 			margin-left:-40px;
 		}
+		p.br {
+			padding:20px;
+			position: fixed;
+			right: 0;
+			top:0;
+			background: #222;
+			color:#fff;
+			z-index:120;
+		}
 		@media screen and (min-width:1291px){
 			div#courses-list {
 				position: fixed;
@@ -968,18 +1171,52 @@
 				top: 0;
 				left: 72%;
 				background: #eee;
-				padding:20px;
+				padding:0 20px 20px;
 				overflow-x: hidden;
 				overflow-y: scroll;
+			}
+			div#courses-list h4 {
+				padding-top: 20px;
 			}
 			body {
 				margin-right: 28%;
 			}
+			body.lockScreen {
+				overflow: hidden;
+			}
+			p.br {
+				right:28%;
+				margin:10px;
+				top:58px;
+			}
+			.max-only {
+				display: none;
+			}
+		}
+		@media screen and (max-width:1290px){
+			a#scroll-lock {
+				display: none;
+			}
+			div#courses-list h4 {
+				padding-top: 18px;
+			}
+			.max-only {
+				display: block;
+			}
 		}
 
-		li.announce a {
+		p.alink {
+			padding:20px 0;
+			font-weight: bold;
+		}
+		li.announce a,
+		form a,
+		p.max-only a {
 			color:dodgerblue;
 			font-weight: bold;
+		}
+		form b {
+			font-size: 16px;
 		}
 		#courses-list li a {
 			padding:10px;
@@ -1087,6 +1324,17 @@
 		}
 		.umac-info a .pull-right {
 			float: right;
+		}
+		#study-plan p {
+			padding-bottom: 8px;
+		}
+		#study-plan a, p.br a {
+			color:dodgerblue;
+			text-decoration: none;
+		}
+		p.br a {
+			padding:5px 10px;
+			display: block;
 		}
 	</style>
 
