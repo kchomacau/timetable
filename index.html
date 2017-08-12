@@ -30,7 +30,7 @@
 			</label>
 			<span id="error"></span>
 			<div class="input-wrap">
-				<input type="text" id="coursename" placeholder="EDPE101" autocomplete="off" onkeyup="getsuggestion()">
+				<input type="text" id="coursename" placeholder="e.g., EDPE101" autocomplete="off" onkeyup="getsuggestion()">
 				<a href="javascript:clear_input()" class="pclear">&times;</a>
 				<ul id="suggestion">
 				</ul>
@@ -53,7 +53,7 @@
 		<span id="lock-on">檢視模式<br><small>View Mode</small></span><span id="lock-off">修改模式<br><small>Edit Mode</small></span>
 	</a>
 	<a href="javascript:lockScrollToggle()" id="scroll-lock">
-		<span>鎖定/解鎖畫面滾軸<br><small>Lock/Unlock Screen</small></span>
+		<span>按此<strong class="textlock">鎖定</strong><strong class="textunlock">解鎖</strong>畫面滾軸<br><small>Click to <strong class="textlock">Lock</strong><strong class="textunlock">Unlock</strong> Scrolling</small></span>
 	</a>
 
 	<p class="max-only alink"><a href="#courseheader">往下滾動以查看課程詳細資料</a></p>
@@ -88,7 +88,7 @@
 
 	<p class="br">
 		Jump to Section
-		<a href="#table-top">Timetable</a>
+		<a href="#table-top" class="max-only">Timetable</a>
 		<a href="#courseheader">Courses Detail</a>
 		<a href="#study-plan" id="studyplan-link">Available Courses List</a>
 		<a href="#isw-form">Import</a>
@@ -212,9 +212,15 @@
 		}
 		genIt()
 	}
-	function genIt(courses_list){
+	function genIt(courses_list, no_scroll){
 
-		window.scrollTo(0,document.getElementById("table-top").offsetTop);
+		if(no_scroll && no_scroll===true){
+			window.scrollTo(0,0);
+		}
+		else{
+			window.scrollTo(0,document.getElementById("table-top").offsetTop);
+		}
+
 		document.getElementById("courses-list").scrollTop = 0;
 
 //		courses = courses.sort(function(a,b){return a.code > b.code});
@@ -552,7 +558,7 @@
 
 		// remove other error => keep COURSE ERROR.
 		var er = document.querySelectorAll(".others");
-		for(var el=0; el<er.lenth; el++){
+		for(var el=0; el<er.length; el++){
 			errorDiv.removeChild(er[el]);
 		}
 	}
@@ -589,7 +595,6 @@
 
 		if(!(is_importing && is_importing===true)){
 			is_importing = false;
-			removeError();
 			removeError();
 		}
 
@@ -662,9 +667,7 @@
 		used_colors[courseCode] = undefined;
 		genIt();
 	}
-	if(hasUrlParam === false){
-		genIt();
-	}
+
 	var timeout = undefined;
 	function fetchIt(){
 		var input = document.getElementById("coursename").value;
@@ -709,7 +712,7 @@
 			var im_courses_detail = content.match(/[A-Za-z]{4}[0-9]{3}[^\n]*/g);
 
 			studyPlanLink.style.display = "block";
-			studyPlanDiv.innerHTML = "<hr class='full'><p><b>可選擇的課程列表 Available Courses List</b></p><p class='max-only'><small>&gt; 看一看右上方吧 那裡可以快速切換功能喔~</small><br>&nbsp;</p>";
+			studyPlanDiv.innerHTML = "<hr class='full'><p><b>可選擇的課程列表 Available Courses List</b></p><p class='max-only'><small>&gt; 看一看右上方吧 那裡可以快速切換功能喔~</small></p><p>&nbsp;</p>";
 
 			for(var i=im_courses.length-1; i>=0; i--){
 				if(im_courses.indexOf(im_courses[i]) < i){
@@ -776,6 +779,13 @@
 		    }
 		}
 	}
+
+
+
+
+	if(hasUrlParam === false){
+		genIt(null, true);
+	}
 	
 	</script>
 
@@ -801,8 +811,25 @@
 		li.inactive {
 			color:#aaa;
 		}
-		li.inactive a {
+		li.inactive a,
+		li.inactive p,
+		li.inactive ul {
 			display: none;
+		}
+		#courses-list li.inactive a.del {
+			margin-top: 0;
+		}
+		#courses-list li.inactive h3 {
+			display: inline-block;
+			vertical-align: middle;
+			width: 135px;
+		}
+		ul#courselist > li.inactive > h3 > span {
+			height:22px;
+		}
+		#courses-list li.inactive {
+			padding-top:3px;
+			padding-bottom:3px;
 		}
 		li ul li {
 			padding:5px 0;
@@ -989,16 +1016,33 @@
 			position: relative;
 		}
 		a#scroll-lock {
-			color:#fff;
-			background: dodgerblue;
 			position: fixed;
 			right: 28%;
 			margin: 10px 10px 0 0;
 			top:0;
 			width: 150px;
+			background: dodgerblue;
+			color:#fff;
+		} {
+			display: none;
+		}
+		a#scroll-lock .textunlock,
+		.lockScreen a#scroll-lock .textlock {
+			display: none;
+		}
+		a#scroll-lock .textlock,
+		.lockScreen a#scroll-lock .textunlock {
+			display: inline;
 		}
 		a#scroll-lock:hover {
 			background: #0678e6;
+		}
+		.lockScreen a#scroll-lock {
+			background: #ffdada;
+			color:#ff8080;
+		}
+		.lockScreen a#scroll-lock:hover {
+			background: #ffc9c9;
 		}
 		a#lock span,
 		a#scroll-lock span {
@@ -1190,7 +1234,7 @@
 				top:58px;
 			}
 			.max-only {
-				display: none;
+				display: none !important;
 			}
 		}
 		@media screen and (max-width:1290px){
@@ -1201,7 +1245,7 @@
 				padding-top: 18px;
 			}
 			.max-only {
-				display: block;
+				display: block !important;
 			}
 		}
 
