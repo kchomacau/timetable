@@ -952,42 +952,67 @@ function draw_diagram(less_arr_fromObj, color){
 
 	var str_l = "";
 
+	less_arr_fromObj.sort(function(a,b){
+		return convertToStamp(a.timeslot) - convertToStamp(b.timeslot);
+	})
+
 	for(var i in less_arr_fromObj){
 		str_l += "<br>" + less_arr_fromObj[i].timeslot + " -- " + less_arr_fromObj[i].count + "節";
 
 	// 把每座大樓都Loop一次
 		var count_total = 0;
-		var count_total_obj = {};
+		var count_total_obj = [];
 
 		var max_percent = 0;
+		var max_count = 0;
 
 		for(var j in less_arr_fromObj[i]){
 			if(j !== "timeslot" && j !== "count"){
 				count_total++;
 
-				var percent = (parseInt(less_arr_fromObj[i][j]) / parseInt(less_arr_fromObj[i].count)).toFixed(1);
-				count_total_obj[j] = percent;
+				var thscount = parseInt(less_arr_fromObj[i][j]);
+				var count_wholeBuilding = parseInt(less_arr_fromObj[i].count);
 
-				if(percent > max_percent){
+				var percent = (thscount / count_wholeBuilding).toFixed(1);
+
+				count_total_obj.push({
+					venue: j,
+					perc: percent,
+					count: thscount
+				});
+
+				if(thscount > max_count){
 					max_percent = percent;
+					max_count = thscount;
 				}
 			}
 		}
 
 		str_l += '<div>';
 
-		var total_width = (100-30);
+		// 左邊文字佔據 30%.
+		var total_width = (100-30);	// in percent
 
-		for(ven in count_total_obj){
+		if(max_count < 10){
+			total_width = 30;	// in percent
+		}
 
-			var bar_width = parseInt(total_width * count_total_obj[ven] / max_percent);
+		// 按課堂數量多少,倒序排列
+		count_total_obj.sort(function(a,b){return b.perc - a.perc});
+
+		for(v in count_total_obj){
+
+			console.log(total_width, count_total_obj[v].perc, max_percent, total_width * count_total_obj[v].perc / max_percent);
+
+			var bar_width = parseInt(total_width * count_total_obj[v].perc / max_percent);
 			var bar_height = 20;
 
 			if(bar_width < 2){
 				bar_width = 2;
 			}
 
-			str_l += '<div><div style="width:' + (100 - total_width - 2) + '%;display:inline-block;vertical-align:middle;text-align:right;color:'+color+';font-size:13px;font-weight:bold;padding-right:2%;">' + ven + '</div><div style="width:' + bar_width + '%;height:' + bar_height + 'px;display:inline-block;margin:3px 0;background:'+color+';vertical-align:middle"></div></div>';
+			str_l += '<div><div style="width:' + 28 + '%;padding-right:' + 2 + '%;display:inline-block;vertical-align:middle;text-align:right;color:'+color+';font-size:13px;font-weight:bold;">' + count_total_obj[v].venue + '</div>'
+			 + '<div style="width:' + bar_width + '%;height:' + bar_height + 'px;display:inline-block;margin:3px 0;background:'+color+';vertical-align:middle"></div></div>';
 		}
 
 		str_l += '</div>';
@@ -1181,7 +1206,7 @@ function find_period_pr(starttext, endtext, day, ven){
 		}
 
 
-	// 將object變成array, 方便排序
+	// 將object變成array
 		var less_arr_fromObj = [];
 		for(var i in less_arr){
 			less_arr[i].timeslot = i;
@@ -1192,11 +1217,6 @@ function find_period_pr(starttext, endtext, day, ven){
 			less_arr_2[i].timeslot = i;
 			less_arr_2_fromObj.push(less_arr_2[i]);
 		}
-
-	// 按課堂數量多少,倒序排列
-		less_arr_fromObj.sort(function(a,b){return b.count-a.count});
-		less_arr_2_fromObj.sort(function(a,b){return b.count-a.count});
-
 
 	// 結果拼成字串
 		var str_l = "";
