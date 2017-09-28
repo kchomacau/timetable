@@ -1,0 +1,635 @@
+body {
+	font-family: arial;
+}
+body, h1, h2, h3, h4, h5, h6, p {
+	padding:0;
+	margin:0;
+}
+ul {
+	margin-top:0;
+	padding-left:20px;
+}
+li {
+	padding:15px 0;
+}
+ul.inst li {
+	padding:10px 0 0 0;
+	font-size: 13px;
+}
+li.inactive {
+	color:#aaa;
+}
+li.inactive a,
+li.inactive p,
+li.inactive ul {
+	display: none;
+}
+#courses-list li.inactive a.del {
+	margin-top: 0;
+}
+#courses-list li.inactive h3 {
+	display: inline-block;
+	vertical-align: middle;
+	width: 135px;
+}
+ul#courselist > li.inactive > h3 > span {
+	height:22px;
+}
+#courses-list li.inactive {
+	padding-top:3px;
+	padding-bottom:3px;
+}
+li ul li {
+	padding:5px 0;
+}
+body {
+	padding:20px;
+}
+form {
+	padding:5px 0 25px 0;
+}
+div#wrapper {
+	width:888px;
+	overflow: hidden;
+	position: relative;
+	padding-top: 5px;
+}
+div#timetable {
+	width:978px;
+	position: relative;
+	overflow: hidden;
+	zoom:2;
+	-webkit-transform:scale(0.5);
+	-webkit-transform-origin:0 0;
+	transform:scale(0.5);
+	transform-origin:0 0;
+	-moz-transform:scale(1);
+	padding-top:30px;
+}
+div.col {
+	width:130px;
+	float:left;
+	border:2px solid #ccc;
+	border-top:0;
+	border-bottom:0;
+	margin:5px 0 5px 5px;
+	position: relative;
+}
+div.col a, div.col div {
+	position: absolute;
+	left:0;
+	right:0;
+	border:1px solid #000;
+	color:#000;
+	text-align: center;
+	font-size:12px;
+	overflow:hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	text-decoration: none;
+	padding:5px;
+}
+div.col div.header {
+	top:-35px;
+}
+span.cross,
+span.alt-text,
+div.col div.background,
+div#wrapper div#overlay {
+	position: absolute;
+	left:0;
+	top:0;
+	right:0;
+	bottom:0;
+}
+div#wrapper div#overlay.lock {
+	z-index:99;
+}
+div#wrapper div#overlay.unlock {
+	display: none;
+}
+span.cross,
+span.alt-text {
+	font-size: 36px;
+	margin: auto;
+	opacity:0;
+	padding:0 0 9px 0;
+	color:#fff;
+}
+span.alt-text {
+	font-size: 12px;
+	padding:22px 0 0 0;
+	-webkit-transform:scale(0.75);
+	transform:scale(0.75);
+	color:rgba(255,255,255,0.8);
+}
+div.col div.background {
+	opacity:0.6;
+	border:0;
+}
+div.col a:hover {
+	color:rgba(255,255,255,0);
+	z-index:10;
+	-webkit-transform:scale(1.15);
+	transform:scale(1.15);
+}
+div.col a:hover div.background {
+	opacity:1;
+}
+div.col a:hover span.cross,
+div.col a:hover span.alt-text {
+	opacity: 1;
+}
+div.col.timestamps {
+	color:#ccc;
+	border-color:#fff;
+	width:40px;
+}
+div.col.timestamps div {
+	text-align:right;
+	font-size:11px;
+	border:0;
+	color:#aaa;
+}
+label, form p {
+	font-size: 13px;
+}
+input[type="text"],
+textarea {
+	font-size:16px;
+	padding:5px;
+	border:1px solid #ddd;
+	-webkit-border-radius:3px;
+	border-radius:3px;
+	outline:0;
+}
+textarea {
+	overflow: hidden;
+}
+input[type="text"]:hover,
+textarea:hover  {
+	border-color:#999;
+}
+input[type="text"]:focus,
+textarea:focus  {
+	border-color:#0089ff;
+}
+#isw-form textarea {
+	width:100%;
+	height:250px;
+}
+input[type="submit"]{
+	padding:7px 12px;
+	outline:0;
+	background:#ddd;
+	color:#444;
+	border:0;
+	-webkit-border-radius:3px;
+	border-radius:3px;
+	cursor: pointer;
+}
+input[type="submit"]:hover{
+	background:#ccc;
+	color:#222;
+}
+#isw-form input[type="submit"] {
+	background: darkturquoise;
+	color:#fff;
+}
+#isw-form input[type="submit"]:hover {
+	background: #00c7ca;
+}
+#error {
+	color:crimson;
+	font-size:16px;
+	display: block;
+	font-weight: bold;
+}
+#error span {
+	padding: 10px 0 3px 0;
+	display: block;
+}
+a#lock, a#scroll-lock {
+	display: block;
+	text-align: center;
+	height:48px;
+	margin: 4px 0 5px;
+	-webkit-border-radius:3px;
+	border-radius:3px;
+	text-decoration: none;
+	font-size: 14px;
+	line-height: 14px;
+	overflow: hidden;
+	background: #f1f1f1;
+	width:140px;
+	position: relative;
+}
+a#scroll-lock {
+	position: fixed;
+	right: 28%;
+	margin: 10px 10px 0 0;
+	top:0;
+	width: 150px;
+	background: dodgerblue;
+	color:#fff;
+} {
+	display: none;
+}
+a#scroll-lock .textunlock,
+.lockScreen a#scroll-lock .textlock {
+	display: none;
+}
+a#scroll-lock .textlock,
+.lockScreen a#scroll-lock .textunlock {
+	display: inline;
+}
+a#scroll-lock:hover {
+	background: #0678e6;
+}
+.lockScreen a#scroll-lock {
+	background: #ffdada;
+	color:#ff8080;
+}
+.lockScreen a#scroll-lock:hover {
+	background: #ffc9c9;
+}
+a#lock span,
+a#scroll-lock span {
+	position: absolute;
+	padding:10px 0 0;
+	height:100px;
+	overflow: hidden;
+	-webkit-transition: left 0.2s ease-out, right 0.2s ease-out, background 0.2s ease-out;
+	transition: left 0.2s ease-out, right 0.2s ease-out, background 0.2s ease-out;
+}
+a#scroll-lock span {
+	width: 100%;
+	left:0;
+}
+a #lock-off {
+	left:0;
+}
+a #lock-on {
+	right:0;
+}
+a #lock-off,
+a #lock-on {
+	width:70%;
+}
+a#lock.unlock #lock-off {
+	background:#0A79F3;
+	color:#fff;
+	z-index:9;
+}
+a#lock.lock #lock-on {
+	color:#666;
+	background: #ccc;
+	z-index:9;
+}
+a#lock.lock #lock-off,
+a#lock.unlock #lock-on {
+	color:#ccc;
+}
+a#lock.lock #lock-off {
+	left:-10px;
+}
+a#lock.unlock #lock-on {
+	right:-10px;
+}
+li p {
+	padding-top:8px;
+}
+li p, li li {
+	font-size: 13px;
+}
+.daytime {
+	position: absolute;
+	z-index:-3;
+	color:#ccc;
+	font-size:28px;
+	letter-spacing: 5px;
+	left:55px;
+	width:828px;
+	text-align: center;
+	overflow: hidden;
+}
+.daytime#morning {
+	top:35px;
+}
+.daytime#night {
+	bottom:5px;
+}
+.daytime#afternoon {
+	border:5px dotted #ccc;
+	border-left: 0;
+	border-right: 0;
+}
+hr {
+	border:0;
+	background:transparent;
+	border-top:1px dotted #000;
+	padding:0;
+	margin:3px;
+	display: block;
+}
+hr.full {
+	margin:25px -5px;
+	border-top:1px solid #ccc;
+}
+li.announce {
+	padding:5px 0;
+	color:#ff6a00;
+	font-size: 14px;
+}
+li.announce a {
+	color:#ff6a00;
+}
+.input-wrap {
+	position: relative;
+	display: inline-block;
+}
+ul#suggestion,
+ul#suggestion li {
+	margin:0;
+	padding:0;
+	outline:0;
+}
+ul#suggestion {
+	position: absolute;
+	width: 130%;
+	background:#f1f1f1;
+	z-index:101;
+	margin-top:-1;
+	margin-bottom:25px;
+}
+ul#suggestion li {
+	display: block;
+	margin:3px 3px 0 3px;
+	padding:0;
+}
+ul#suggestion li a {
+	background: #fff;
+	display: block;
+	text-decoration: none;
+	font-size:12px;
+	padding:10px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	color:#999;
+	text-transform: lowercase;
+}
+ul#suggestion li a:hover {
+	background:#f1f1f1;
+}
+ul#suggestion li a b {
+	font-size:14px;
+	font-weight: normal;
+	color:#222;
+}
+ul#suggestion li a span {
+	color:salmon;
+}
+ul#suggestion li a:hover b {
+	font-weight:bold;
+	color:#444;
+}
+ul#suggestion li:last-child {
+	margin-bottom:8px;
+}
+a.pclear {
+	width:40px;
+	height:40px;
+	line-height: 40px;
+	color:#999;
+	font-size: 24px;
+	text-align:center;
+	overflow: hidden;
+	text-decoration: none;
+	vertical-align: middle;
+	display: inline-block;
+	margin-left:-40px;
+}
+p.br {
+	padding:20px;
+	position: fixed;
+	right: 0;
+	top:0;
+	background: #222;
+	color:#fff;
+	z-index:120;
+}
+@media screen and (min-width:1276px){
+	div#courses-list {
+		position: fixed;
+		right: 0;
+		bottom: 0;
+		top: 0;
+		left: 72%;
+		background: #eee;
+		padding:0 20px 20px;
+		overflow-x: hidden;
+		overflow-y: scroll;
+	}
+	div#courses-list h4 {
+		padding-top: 20px;
+	}
+	body {
+		margin-right: 28%;
+	}
+	body.lockScreen {
+		overflow: hidden;
+	}
+	p.br {
+		right:28%;
+		margin:10px;
+		top:58px;
+	}
+	.max-only {
+		display: none !important;
+	}
+}
+@media screen and (max-width:1275px){
+	a#scroll-lock {
+		display: none;
+	}
+	div#courses-list h4 {
+		padding-top: 18px;
+	}
+	.min-only {
+		display: none !important;
+	}
+}
+
+p.alink {
+	padding:20px 0;
+	font-weight: bold;
+}
+li.announce a,
+form a,
+p.max-only a {
+	color:dodgerblue;
+	font-weight: bold;
+}
+form b {
+	font-size: 16px;
+}
+#courses-list li a {
+	padding:10px;
+	-webkit-border-radius:3px;
+	border-radius:3px;
+	display: inline-block;
+	background: dodgerblue;
+	color:#fff;
+	text-decoration: none;
+	margin-top: 7px;
+	font-size: 14px;
+	height: 18px;
+}
+#courses-list li a:before {
+	font-size: 30px;
+	display: inline-block;
+	vertical-align: top;
+	padding-right: 3px;
+	margin-top: -7px;
+}
+#courses-list li a.del {
+	background: #ffdada;
+	color: #ff8080;
+}
+#courses-list li a.del:hover {
+	background: #ffc9c9;
+}
+#courses-list li a.del:before {
+	content:'\d7';
+}
+#courses-list li a.add:hover {
+	background: #0282ff;
+}
+#courses-list li a.add:before {
+	content:'+';
+}
+#courses-list.active li a.add,
+#courses-list.inactive li.inactive a.add,
+#courses-list.inactive li a.del {
+	display: none;
+}
+#courses-list.inactive li.inactive a.del {
+	display: inline-block;
+}
+ul#courselist {
+	padding-left: 0;
+}
+ul#courselist > li {
+	list-style: none;
+	padding-left: 20px;
+	position: relative;
+}
+ul#courselist > li > h3 > span {
+	-webkit-border-radius:3px;
+	border-radius:3px;
+	width:10px;
+	height:35px;
+	display: inline-block;
+	position: absolute;
+	left:5px;
+	vertical-align: middle;
+}
+ul#courselist > li > h3 + p {
+	padding-top: 3px;
+}
+#courses-list span.warning {
+	margin:2px 0 0 0;
+	-webkit-border-radius:2px;
+	border-radius:2px;
+	background: bisque;
+	color:peru;
+	display: inline-block;
+	padding:3px;
+}
+.umac-info {
+	display: block;
+	padding: 0 13px 13px;
+	background: #ccc;
+	color:#666;
+	-webkit-border-radius:3px;
+	border-radius:3px;
+	overflow: hidden;
+	margin: 10px 0;
+}
+.umac-info .header {
+	font-size: 13px;
+	padding:10px 13px 8px;
+	background: #222;
+	color:#fff;
+	margin-left: -13px;
+	margin-right: -13px;
+}
+.umac-info .row.well,
+.umac-info .col-md-4,
+.umac-info .panel-collapse {
+	display: none;
+}
+.umac-info a {
+	color: #333;
+	text-decoration: none;
+	cursor: default;
+	font-size: 16px;
+	padding-top: 10px;
+	display: block;
+}
+.umac-info a .pull-right {
+	float: right;
+}
+#study-plan p {
+	padding-bottom: 8px;
+}
+#study-plan a, p.br a {
+	color:dodgerblue;
+	text-decoration: none;
+}
+p.br a {
+	padding:5px 10px;
+	display: block;
+}
+a#scroll-lock {
+	z-index:120;
+}
+a.styled {
+	padding: 8px 13px;
+	background: #222;
+	color: #fff;
+	display: inline-block;
+	text-decoration: none;
+	-webkit-border-radius: 2px;
+	font-size: 13px;
+	margin:10px 0;
+	white-space: nowrap;
+}
+a.styled:hover {
+	background: #555;
+}
+a.styled#undo:before {
+	content:'＜';
+	left:-3px;
+}
+a.styled#redo:after {
+	content:'＞';
+	right: -3px;
+}
+a.styled#undo:before,
+a.styled#redo:after {
+	position: relative;
+	display: inline-block;
+	-webkit-transform:scale(0.7,1);
+	transform:scale(0.7,1);
+}
+a.styled.hidden#redo {
+	display: none;
+}
+a.styled.hidden#undo {
+	width:0;
+	overflow: hidden;
+	padding:0;
+	margin-right:100px;
+}
