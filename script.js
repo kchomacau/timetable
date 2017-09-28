@@ -1039,15 +1039,35 @@ function find_period_pr(starttext, endtext, day, ven){
 			var conflict_arr = [];
 			var dates = [];
 
-			if(!less_arr[im_courses[i].start]){
-				less_arr[im_courses[i].start] = 0;
-			}
-			less_arr[im_courses[i].start]++;
+		// 計上課
+			var key = im_courses[i].start;
+			var venue = im_courses[i].venue.split("-")[0];
 
-			if(!less_arr_2[im_courses[i].end]){
-				less_arr_2[im_courses[i].end] = 0;
+		// 計算該時間段的課堂數量
+			if(!less_arr[key]){
+				less_arr[key] = {count: 0};
 			}
-			less_arr_2[im_courses[i].end]++;
+			less_arr[key].count++;
+
+		// 計算該時間段、同一地點的課堂數量
+			if(!less_arr[key][venue]){
+				less_arr[key][venue] = 0;
+			}
+			less_arr[key][venue]++;
+
+		// 計落課
+			var key = im_courses[i].end;
+
+			if(!less_arr_2[key]){
+				less_arr_2[key] = {count: 0};
+			}
+			less_arr_2[key].count++;
+
+			if(!less_arr_2[key][venue]){
+				less_arr_2[key][venue] = 0;
+			}
+			less_arr_2[key][venue]++;
+
 
 		for(var jx in courses_info){
 
@@ -1109,17 +1129,83 @@ function find_period_pr(starttext, endtext, day, ven){
 
 		}
 
-		var splist = document.getElementById("splist");
 
-		splist.innerHTML += "(上課時間)";
+	// 將object變成array, 方便排序
+		var less_arr_fromObj = [];
 		for(var i in less_arr){
-			splist.innerHTML += "<br>" + i + " -- " + less_arr[i];
+			less_arr[i].timeslot = i;
+			less_arr_fromObj.push(less_arr[i]);
+		}
+		var less_arr_2_fromObj = [];
+		for(var i in less_arr_2){
+			less_arr_2[i].timeslot = i;
+			less_arr_2_fromObj.push(less_arr_2[i]);
 		}
 
-		splist.innerHTML += "<br>&nbsp;<br>(下課時間)";
-		for(var i in less_arr_2){
-			splist.innerHTML += "<br>" + i + " -- " + less_arr_2[i];
+	// 按課堂數量多少,倒序排列
+		less_arr_fromObj.sort(function(a,b){return b.count-a.count});
+		less_arr_2_fromObj.sort(function(a,b){return b.count-a.count});
+
+
+	// 結果拼成字串
+		var str_l = "";
+
+		str_l += "(上課時間)";
+		for(var i in less_arr_fromObj){
+			str_l += "<br>" + less_arr_fromObj[i].timeslot + " -- " + less_arr_fromObj[i].count + "節";
+
+		// 把每座大樓都Loop一次
+			var count_total = 0;
+			var count_total_obj = {};
+
+			var max_percent = 0;
+
+			for(var j in less_arr_fromObj[i]){
+				if(j !== "timeslot" && j !== "count"){
+					count_total++;
+
+					var percent = (parseInt(less_arr_fromObj[i][j]) / parseInt(less_arr_fromObj[i].count)).toFixed(1);
+					count_total_obj[j] = percent;
+
+					if(percent > max_percent){
+						max_percent = percent;
+					}
+				}
+			}
+
+			str_l += '<div>';
+
+			var total_width = (100-30);
+
+			for(ven in count_total_obj){
+
+				var bar_width = parseInt(total_width * count_total_obj[ven] / max_percent);
+				var bar_height = 20;
+
+				if(bar_width < 2){
+					bar_width = 2;
+				}
+
+				str_l += '<div><div style="width:' + (100 - total_width - 2) + '%;display:inline-block;vertical-align:middle;text-align:right;color:limegreen;font-size:13px;font-weight:bold;padding-right:2%;">' + ven + '</div><div style="width:' + bar_width + '%;height:' + bar_height + 'px;display:inline-block;margin:3px 0;background:limegreen;vertical-align:middle"></div></div>';
+			}
+
+			str_l += '</div>';
 		}
+
+		str_l += "<br>&nbsp;<br>(下課時間)";
+		for(var i in less_arr_2_fromObj){
+			str_l += "<br>" + less_arr_2_fromObj[i].timeslot + " -- " + less_arr_2_fromObj[i].count + "節";
+
+			for(var j in less_arr_2_fromObj[i]){
+				if(j !== "timeslot" && j !== "count"){
+					str_l += "<br> -- " + j + "::" + (parseInt(less_arr_2_fromObj[i][j]) / parseInt(less_arr_2_fromObj[i].count) * 100).toFixed(2) + '%';
+				}
+			}
+		}
+
+		str_l += "<br>&nbsp;";
+
+		document.getElementById("splist").innerHTML = str_l;
 
 		studyPlanDiv.appendChild(div);
 	}
