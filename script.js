@@ -948,6 +948,57 @@ function addIsw(){
 	}
 }
 
+function draw_diagram(less_arr_fromObj){
+
+	var str_l = "";
+
+	for(var i in less_arr_fromObj){
+		str_l += "<br>" + less_arr_fromObj[i].timeslot + " -- " + less_arr_fromObj[i].count + "節";
+
+	// 把每座大樓都Loop一次
+		var count_total = 0;
+		var count_total_obj = {};
+
+		var max_percent = 0;
+
+		for(var j in less_arr_fromObj[i]){
+			if(j !== "timeslot" && j !== "count"){
+				count_total++;
+
+				var percent = (parseInt(less_arr_fromObj[i][j]) / parseInt(less_arr_fromObj[i].count)).toFixed(1);
+				count_total_obj[j] = percent;
+
+				if(percent > max_percent){
+					max_percent = percent;
+				}
+			}
+		}
+
+		str_l += '<div>';
+
+		var total_width = (100-30);
+
+		for(ven in count_total_obj){
+
+			var bar_width = parseInt(total_width * count_total_obj[ven] / max_percent);
+			var bar_height = 20;
+
+			if(bar_width < 2){
+				bar_width = 2;
+			}
+
+			str_l += '<div><div style="width:' + (100 - total_width - 2) + '%;display:inline-block;vertical-align:middle;text-align:right;color:limegreen;font-size:13px;font-weight:bold;padding-right:2%;">' + ven + '</div><div style="width:' + bar_width + '%;height:' + bar_height + 'px;display:inline-block;margin:3px 0;background:limegreen;vertical-align:middle"></div></div>';
+		}
+
+		str_l += '</div>';
+	}
+
+	return str_l;
+}
+
+
+
+
 function find_period_pr(starttext, endtext, day, ven){
 
 	var start = 1;
@@ -1150,58 +1201,8 @@ function find_period_pr(starttext, endtext, day, ven){
 	// 結果拼成字串
 		var str_l = "";
 
-		str_l += "(上課時間)";
-		for(var i in less_arr_fromObj){
-			str_l += "<br>" + less_arr_fromObj[i].timeslot + " -- " + less_arr_fromObj[i].count + "節";
-
-		// 把每座大樓都Loop一次
-			var count_total = 0;
-			var count_total_obj = {};
-
-			var max_percent = 0;
-
-			for(var j in less_arr_fromObj[i]){
-				if(j !== "timeslot" && j !== "count"){
-					count_total++;
-
-					var percent = (parseInt(less_arr_fromObj[i][j]) / parseInt(less_arr_fromObj[i].count)).toFixed(1);
-					count_total_obj[j] = percent;
-
-					if(percent > max_percent){
-						max_percent = percent;
-					}
-				}
-			}
-
-			str_l += '<div>';
-
-			var total_width = (100-30);
-
-			for(ven in count_total_obj){
-
-				var bar_width = parseInt(total_width * count_total_obj[ven] / max_percent);
-				var bar_height = 20;
-
-				if(bar_width < 2){
-					bar_width = 2;
-				}
-
-				str_l += '<div><div style="width:' + (100 - total_width - 2) + '%;display:inline-block;vertical-align:middle;text-align:right;color:limegreen;font-size:13px;font-weight:bold;padding-right:2%;">' + ven + '</div><div style="width:' + bar_width + '%;height:' + bar_height + 'px;display:inline-block;margin:3px 0;background:limegreen;vertical-align:middle"></div></div>';
-			}
-
-			str_l += '</div>';
-		}
-
-		str_l += "<br>&nbsp;<br>(下課時間)";
-		for(var i in less_arr_2_fromObj){
-			str_l += "<br>" + less_arr_2_fromObj[i].timeslot + " -- " + less_arr_2_fromObj[i].count + "節";
-
-			for(var j in less_arr_2_fromObj[i]){
-				if(j !== "timeslot" && j !== "count"){
-					str_l += "<br> -- " + j + "::" + (parseInt(less_arr_2_fromObj[i][j]) / parseInt(less_arr_2_fromObj[i].count) * 100).toFixed(2) + '%';
-				}
-			}
-		}
+		str_l += "(上課時間)" + draw_diagram(less_arr_fromObj);
+		str_l += "<br>&nbsp;<br>(下課時間)" + draw_diagram(less_arr_2_fromObj);
 
 		str_l += "<br>&nbsp;";
 
