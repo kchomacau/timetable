@@ -948,7 +948,7 @@ function addIsw(){
 	}
 }
 
-function draw_diagram(less_arr_fromObj){
+function draw_diagram(less_arr_fromObj, color){
 
 	var str_l = "";
 
@@ -987,7 +987,7 @@ function draw_diagram(less_arr_fromObj){
 				bar_width = 2;
 			}
 
-			str_l += '<div><div style="width:' + (100 - total_width - 2) + '%;display:inline-block;vertical-align:middle;text-align:right;color:limegreen;font-size:13px;font-weight:bold;padding-right:2%;">' + ven + '</div><div style="width:' + bar_width + '%;height:' + bar_height + 'px;display:inline-block;margin:3px 0;background:limegreen;vertical-align:middle"></div></div>';
+			str_l += '<div><div style="width:' + (100 - total_width - 2) + '%;display:inline-block;vertical-align:middle;text-align:right;color:'+color+';font-size:13px;font-weight:bold;padding-right:2%;">' + ven + '</div><div style="width:' + bar_width + '%;height:' + bar_height + 'px;display:inline-block;margin:3px 0;background:'+color+';vertical-align:middle"></div></div>';
 		}
 
 		str_l += '</div>';
@@ -1201,8 +1201,8 @@ function find_period_pr(starttext, endtext, day, ven){
 	// 結果拼成字串
 		var str_l = "";
 
-		str_l += "(上課時間)" + draw_diagram(less_arr_fromObj);
-		str_l += "<br>&nbsp;<br>(下課時間)" + draw_diagram(less_arr_2_fromObj);
+		str_l += "(上課時間)" + draw_diagram(less_arr_fromObj, "limegreen");
+		str_l += "<br>&nbsp;<br>(下課時間)" + draw_diagram(less_arr_2_fromObj, "salmon");
 
 		str_l += "<br>&nbsp;";
 
