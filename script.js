@@ -1024,7 +1024,12 @@ function find_period_pr(starttext, endtext, day, ven){
 	else{
 		studyPlanDiv.innerHTML += '<p>&nbsp;</p>';
 
+		studyPlanDiv.innerHTML += '<p>共有 ' + (im_courses.length) + ' 節課</p>';
+		studyPlanDiv.innerHTML += '<p>時間分佈：<br><span id="splist"></span></p>';
+
 		var div = document.createElement("div");
+		var less_arr = {};
+		var less_arr_2 = {};
 
 		for(var i=0; i<im_courses.length; i++){
 			var p = document.createElement("p");
@@ -1033,6 +1038,16 @@ function find_period_pr(starttext, endtext, day, ven){
 
 			var conflict_arr = [];
 			var dates = [];
+
+			if(!less_arr[im_courses[i].start]){
+				less_arr[im_courses[i].start] = 0;
+			}
+			less_arr[im_courses[i].start]++;
+
+			if(!less_arr_2[im_courses[i].end]){
+				less_arr_2[im_courses[i].end] = 0;
+			}
+			less_arr_2[im_courses[i].end]++;
 
 		for(var jx in courses_info){
 
@@ -1092,6 +1107,18 @@ function find_period_pr(starttext, endtext, day, ven){
 				div.appendChild(p);
 			}
 
+		}
+
+		var splist = document.getElementById("splist");
+
+		splist.innerHTML += "(上課時間)";
+		for(var i in less_arr){
+			splist.innerHTML += "<br>" + i + " -- " + less_arr[i];
+		}
+
+		splist.innerHTML += "<br>&nbsp;<br>(下課時間)";
+		for(var i in less_arr_2){
+			splist.innerHTML += "<br>" + i + " -- " + less_arr_2[i];
 		}
 
 		studyPlanDiv.appendChild(div);
