@@ -1308,3 +1308,6 @@ if(localStorage["prdata"]){
 		ven.value = old_data.ven;
 	}
 }
+
+genIt();
+
