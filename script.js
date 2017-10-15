@@ -948,6 +948,10 @@ function addIsw(){
 	}
 }
 
+
+
+var totalSort = {};
+
 function draw_diagram(less_arr_fromObj, color){
 
 	var str_l = "";
@@ -956,8 +960,9 @@ function draw_diagram(less_arr_fromObj, color){
 		return convertToStamp(a.timeslot) - convertToStamp(b.timeslot);
 	})
 
+
 	for(var i in less_arr_fromObj){
-		str_l += "<br>" + less_arr_fromObj[i].timeslot + " -- " + less_arr_fromObj[i].count + "節";
+		str_l += "<br><small>" + less_arr_fromObj[i].timeslot + " -- " + less_arr_fromObj[i].count + "節</small>";
 
 	// 把每座大樓都Loop一次
 		var count_total = 0;
@@ -980,6 +985,11 @@ function draw_diagram(less_arr_fromObj, color){
 					perc: percent,
 					count: thscount
 				});
+
+				if(!totalSort[j]){
+					totalSort[j] = 0;
+				}
+				totalSort[j] += thscount;
 
 				if(thscount > max_count){
 					max_percent = percent;
@@ -1011,12 +1021,14 @@ function draw_diagram(less_arr_fromObj, color){
 				bar_width = 2;
 			}
 
-			str_l += '<div><div style="width:' + 28 + '%;padding-right:' + 2 + '%;display:inline-block;vertical-align:middle;text-align:right;color:'+color+';font-size:13px;font-weight:bold;">' + count_total_obj[v].venue + '</div>'
+			str_l += '<div><div style="width:' + 28 + '%;padding-right:' + 2 + '%;display:inline-block;vertical-align:middle;text-align:right;color:'+color+';font-size:13px;font-weight:bold;">' + count_total_obj[v].venue + ' / ' + count_total_obj[v].count + '</div>'
 			 + '<div style="width:' + bar_width + '%;height:' + bar_height + 'px;display:inline-block;margin:3px 0;background:'+color+';vertical-align:middle"></div></div>';
 		}
 
 		str_l += '</div>';
 	}
+
+	console.log(totalSort);
 
 	return str_l;
 }
@@ -1098,10 +1110,9 @@ function find_period_pr(starttext, endtext, day, ven){
 		studyPlanDiv.innerHTML += '<p>此期間沒有課堂 / No class in this period.';
 	}
 	else{
-		studyPlanDiv.innerHTML += '<p>&nbsp;</p>';
+		// studyPlanDiv.innerHTML += '<p>&nbsp;</p>';
 
 		studyPlanDiv.innerHTML += '<p>共有 ' + (im_courses.length) + ' 節課</p>';
-		studyPlanDiv.innerHTML += '<p>時間分佈：<br><span id="splist"></span></p>';
 
 		var div = document.createElement("div");
 		var less_arr = {};
@@ -1219,16 +1230,17 @@ function find_period_pr(starttext, endtext, day, ven){
 		}
 
 	// 結果拼成字串
-		var str_l = "";
+		var str_l = "<p>&nbsp;</p><p><b>時間及地點分佈 Distribution</b></p>";
 
-		str_l += "(上課時間)" + draw_diagram(less_arr_fromObj, "limegreen");
-		str_l += "<br>&nbsp;<br>(下課時間)" + draw_diagram(less_arr_2_fromObj, "salmon");
+		str_l += "<small>(上課時間)</small>" + draw_diagram(less_arr_fromObj, "limegreen");
+		str_l += "<br>&nbsp;<br><small>(下課時間)</small>" + draw_diagram(less_arr_2_fromObj, "salmon");
 
 		str_l += "<br>&nbsp;";
 
-		document.getElementById("splist").innerHTML = str_l;
-
 		studyPlanDiv.appendChild(div);
+
+		studyPlanDiv.innerHTML += '<p><span id="splist"></span></p>';
+		document.getElementById("splist").innerHTML = str_l;
 	}
 }
 
