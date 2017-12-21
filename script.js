@@ -1,5 +1,6 @@
 var timetable = document.getElementById("timetable");
 var template = timetable.innerHTML;
+var finding_period = false;
 var courses = [
 ];
 var allCourseMode = false;
@@ -486,6 +487,11 @@ if(!document.getElementById(ths_id)){
 		localStorage["coursesJson"] = JSON.stringify(courses_list);
 		used_colors = used_colors_list;
 	}
+
+
+	if(finding_period===true){
+		return find_period();
+	}
 	return true;
 }
 function print_error(msg, code){
@@ -555,7 +561,13 @@ function look(coursecode, is_error, is_importing){
 		genIt(courses_list_tmp);
 	}
 }
-function add(coursecode, is_importing){
+function add(coursecode, is_importing, should_remain){
+
+	if(!(should_remain && should_remain===true)){
+		window.setTimeout(function(){
+			document.getElementById("courses-list").scrollTop = 0;
+		},300);
+	}
 
 	if(!(is_importing && is_importing===true)){
 		is_importing = false;
@@ -842,11 +854,21 @@ function find_multi_lab(){
 
 var pref_isw_value = "";
 
+function loadPrevIsw(){
+	pref_isw_value = "";
+
+	if(!localStorage["prIswText"]){
+		localStorage["prIswText"] = "沒有內容 / No Content.";
+	}
+	document.getElementById("isw").value = localStorage["prIswText"];
+}
+
 function addIsw(){
 
 	removeError();
 
 	var content = document.getElementById("isw").value;
+	localStorage["prIswText"] = content;
 
 	document.getElementById("isw").value = "";
 
@@ -870,6 +892,8 @@ function addIsw(){
 	var im_courses = [];
 	var had_repeat = false;
 
+	var is_isw = content.indexOf("Compulsory Major Courses") !== -1;
+
 	if(tmp_im_courses){
 		for(var i=0; i<tmp_im_courses.length; i++){
 
@@ -891,10 +915,13 @@ function addIsw(){
 	// 	return print_error("無法辨識時間表或Study Plan / Unable to identify timetable or study plan.");
 	// }
 	// else if(content.indexOf("Student Information") >= 0){
-	else if(!had_repeat){
+	// else if(!had_repeat){
+	else if(is_isw){
 		// is study plan
 
 		var im_courses_detail = content.match(/[A-Za-z]{4}[0-9]{3}[^\n]*/g);
+
+		finding_period = false;
 
 		studyPlanLink.style.display = "block";
 		studyPlanDiv.innerHTML = "<hr class='full'><p><b>可選擇的課程列表 Available Courses List</b></p><p>&nbsp;</p>";
@@ -932,8 +959,8 @@ function addIsw(){
 
 		for(var i=0; i<im_courses.length; i++){
 			var p = document.createElement("p");
-			p.innerHTML = '<a href="javascript:add(\'' + im_courses[i].code + '\')">' +
-				'<b>' + im_courses[i].code + '</b><br>' + im_courses[i].text + '</a>';
+			p.innerHTML = '<a href="javascript:add(\'' + im_courses[i].code + '\',null,true)">' +
+				'<b>' + im_courses[i].code + '</b><br><small>' + im_courses[i].text + '</small></a>';
 
 			studyPlanDiv.appendChild(p);
 		}
@@ -962,7 +989,7 @@ function draw_diagram(less_arr_fromObj, color){
 
 
 	for(var i in less_arr_fromObj){
-		str_l += "<br><small>" + less_arr_fromObj[i].timeslot + " -- " + less_arr_fromObj[i].count + "節</small>";
+		str_l += "<br><small>" + less_arr_fromObj[i].timeslot + " - " + less_arr_fromObj[i].count + " 節</small>";
 
 	// 把每座大樓都Loop一次
 		var count_total = 0;
@@ -1071,6 +1098,8 @@ function find_period_pr(starttext, endtext, day, ven){
 		);
 	}
 
+	finding_period = true;
+
 	studyPlanLink.style.display = "block";
 	studyPlanDiv.innerHTML = "<hr class='full'><p><b>可選擇的課程列表 Available Courses List</b><br><small>區間 Range: " + range + "</small></p>";
 
@@ -1120,8 +1149,8 @@ function find_period_pr(starttext, endtext, day, ven){
 
 		for(var i=0; i<im_courses.length; i++){
 			var p = document.createElement("p");
-			var stri = '<a href="javascript:add(\'' + im_courses[i].code + '\')">' +
-				'<b>' + im_courses[i].code + '</b><br>' + im_courses[i].name + '<br>Venue: ' + im_courses[i].venue + '</a>';
+			var stri = '<a href="javascript:add(\'' + im_courses[i].code + '\',null,true)">' +
+				'<b>' + im_courses[i].code + '</b><br><small>' + im_courses[i].name + '</small></a><small class="location">@' + im_courses[i].venue + ' by ' + im_courses[i].prof + '</small>';
 
 			var conflict_arr = [];
 			var dates = [];
@@ -1156,11 +1185,20 @@ function find_period_pr(starttext, endtext, day, ven){
 			less_arr_2[key][venue]++;
 
 
+
+		var has_more_than_one_section = false;
+		var target_code_substr = im_courses[i].code.substr(0,7);
+
 		for(var jx in courses_info){
 
 			var ths = courses_info[jx];
 
 			if(ths.code !== im_courses[i].code){
+
+				// if same class, different section
+				if(ths.code.substr(0,7) === target_code_substr){
+					has_more_than_one_section = true;
+				}
 				continue;	// skip to next loop
 			}
 
@@ -1194,23 +1232,26 @@ function find_period_pr(starttext, endtext, day, ven){
 			// stri += "</small>";
 		}
 
+			var umacinfo_text = '<a href="https://umac.info/course/' + im_courses[i].code.substr(0,7) + '" target="_blank" class="umacinfo">前往暗黑資料庫查看評分</a>';
+
+			if(has_more_than_one_section === false){
+				umacinfo_text = '<br><span class="umacinfo">只有這堂，不用看了</span>'
+			}
+
 			if(conflict_arr.length === 0){
-				stri += '<br><span class="warning" style="background:#b8e4b8;color:#099848;">未與現有任何科目衝突</span>';
 
-				stri += '<small>';
+				console.log(dates);
 
-				for(kc in dates){
-					stri += '<br>' + dates[kc];
-				}
-				stri += '</small>';
+				stri += '<small>' + dates.join("<br>") + "</small>";
+				stri += '<span class="warning" style="background:#b8e4b8;color:#099848;">未與現有任何科目衝突</span>';
 
-				p.innerHTML = stri;
+				p.innerHTML = stri + umacinfo_text;
 				studyPlanDiv.appendChild(p);
 			}
 			else{
 				stri = "<del>" + stri + "</del>";
-				stri += '<br><span class="warning">與 ' + conflict_arr.join(', ') + ' 衝突</span>';
-				p.innerHTML = stri;
+				stri += '<span class="warning">與 ' + conflict_arr.join(', ') + ' 衝突</span>';
+				p.innerHTML = stri + umacinfo_text;
 				div.appendChild(p);
 			}
 
@@ -1232,10 +1273,8 @@ function find_period_pr(starttext, endtext, day, ven){
 	// 結果拼成字串
 		var str_l = "<p>&nbsp;</p><p><b>時間及地點分佈 Distribution</b></p>";
 
-		str_l += "<small>(上課時間)</small>" + draw_diagram(less_arr_fromObj, "limegreen");
-		str_l += "<br>&nbsp;<br><small>(下課時間)</small>" + draw_diagram(less_arr_2_fromObj, "salmon");
-
-		str_l += "<br>&nbsp;";
+		str_l += "<small>(上課 Begin at)</small>" + draw_diagram(less_arr_fromObj, "limegreen");
+		str_l += "<br>&nbsp;<br><small>(下課 End at)</small>" + draw_diagram(less_arr_2_fromObj, "salmon");
 
 		studyPlanDiv.appendChild(div);
 
