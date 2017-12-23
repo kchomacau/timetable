@@ -1186,8 +1186,9 @@ function find_period_pr(starttext, endtext, day, ven){
 
 
 
-		var has_more_than_one_section = false;
+		var has_more_than_one_prof = false;
 		var target_code_substr = im_courses[i].code.substr(0,7);
+		var target_code_prof   = im_courses[i].prof;
 
 		for(var jx in courses_info){
 
@@ -1196,8 +1197,9 @@ function find_period_pr(starttext, endtext, day, ven){
 			if(ths.code !== im_courses[i].code){
 
 				// if same class, different section
-				if(ths.code.substr(0,7) === target_code_substr){
-					has_more_than_one_section = true;
+				if(ths.code.substr(0,7) === target_code_substr
+					&& ths.prof !== target_code_prof){
+					has_more_than_one_prof = true;
 				}
 				continue;	// skip to next loop
 			}
@@ -1232,10 +1234,12 @@ function find_period_pr(starttext, endtext, day, ven){
 			// stri += "</small>";
 		}
 
-			var umacinfo_text = '<a href="https://umac.info/course/' + im_courses[i].code.substr(0,7) + '" target="_blank" class="umacinfo">前往暗黑資料庫查看評分</a>';
+			// console.log(target_code_substr);
 
-			if(has_more_than_one_section === false){
-				umacinfo_text = '<br><span class="umacinfo">只有這堂，不用看了</span>'
+			var umacinfo_text = '<br><a href="https://umac.info/course/' + target_code_substr + '" target="_blank" class="umacinfo">前往暗黑資料庫查看評分</a>';
+
+			if(has_more_than_one_prof === false){
+				umacinfo_text = '<br><span class="umacinfo">這科唯一的教授 The only prof of this course</span>'
 			}
 
 			if(conflict_arr.length === 0){
@@ -1243,7 +1247,7 @@ function find_period_pr(starttext, endtext, day, ven){
 				console.log(dates);
 
 				stri += '<small>' + dates.join("<br>") + "</small>";
-				stri += '<span class="warning" style="background:#b8e4b8;color:#099848;">未與現有任何科目衝突</span>';
+				stri += '<span class="warning" style="background:#b8e4b8;color:#099848;">未與現有任何科目衝突 No Conflict</span>';
 
 				p.innerHTML = stri + umacinfo_text;
 				studyPlanDiv.appendChild(p);
@@ -1349,4 +1353,3 @@ if(localStorage["prdata"]){
 }
 
 genIt();
-
