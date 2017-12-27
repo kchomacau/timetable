@@ -80,6 +80,17 @@ var studyPlanDiv = document.getElementById("study-plan");
 var studyPlanLink = document.getElementById("studyplan-link");
 studyPlanLink.style.display = "none";
 
+function getSelectedCourseCodeList(){
+	var arr = [];
+
+	for(var i=0; i<courses.length; i++){
+		if(arr.indexOf(courses[i].code)===-1){
+			arr.push(courses[i].code);
+		}
+	}
+	return arr;
+}
+
 function lockScrollToggle(){
 	var body = document.getElementById("body");
 	if(body.className === ""){
@@ -200,7 +211,24 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 		document.getElementById("redo").className = "styled";
 	}
 
+	// dont print same section twice.
+	var check_block_repeat = [];
+
+	for(var i=courses_list.length-1; i>=0; i--){
+		var ths_json = JSON.stringify(courses_list[i]);
+		if(check_block_repeat.indexOf(ths_json)===-1){
+			check_block_repeat.push(ths_json);
+		}
+		else{
+			courses_list.splice(i, 1, {});
+		}
+	}
+
 	for(var i=0; i<courses_list.length; i++){
+
+		if(!courses_list[i].code){
+			continue;
+		}
 
 		var starttime;
 		var endtime;
@@ -241,7 +269,12 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 		}
 	}
 	heightOf1Min = totalHeight / (latest - earliest);
+
 	for(var i=0; i<courses_list.length; i++){
+
+		if(!courses_list[i].code){
+			continue;
+		}
 		var tmpLineHeight = lineHeight;
 		var weekday = dayName.indexOf(courses_list[i].day);
 		if(weekday > -1){
@@ -419,6 +452,10 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 	// }
 
 	for(var i=courses_list.length-1; i>=0; i--){
+
+		if(!courses_list[i].code){
+			continue;
+		}
 		if(courses_list[i].code !== previousCourse){
 			previousCourse = courses_list[i].code;
 			var li = document.createElement("li");
@@ -437,6 +474,10 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 								: "<p><u>備註 Remark</u><br>" + courses_list[i].remark.replace(/\n/g, "<br>") + "</p>") +
 							'<a href="javascript:add(\'' +courses_list[i].code+ '\')" class="add">加入 Add</a><a href="javascript:deleteIt(\'' +courses_list[i].code+ '\')" class="del">刪除 Delete</a>';
 			if(allCourseMode===true){
+
+				var current_course_code_list = getSelectedCourseCodeList();
+
+				// if(current_course_code_list.indexOf(courses_list[i].code)!==-1){
 				if(i < courses.length){
 					li.className = "inactive";
 				}
@@ -525,9 +566,13 @@ function removeError(code){
 	}
 }
 function look(coursecode, is_error, is_importing){
+
+	// var courses_list_current = getSelectedCourseCodeList();
 	var courses_list_tmp = [];
+
 	for(var i=0; i<courses_info.length; i++){
 		if(courses_info[i].code.substr(0,7) === coursecode){
+			// && courses_list_current.indexOf(courses_info[i].code)===-1){
 			courses_list_tmp.push(courses_info[i]);
 		}
 	}
@@ -543,7 +588,7 @@ function look(coursecode, is_error, is_importing){
 		}
 		else{
 
-			if(window.jQuery){
+			if(window.jQuery && onServer===true){
 				$.post(
 					"check_look_func_available.php",
 					{content: coursecode},
@@ -589,6 +634,7 @@ function add(coursecode, is_importing, should_remain){
 	code_raw = code_raw.replace(/ /g, "").toUpperCase();
 
 	document.getElementById("coursename").value = code_raw;
+	localStorage["prSrchText"] = code_raw;
 
 	if(code_raw.length < 8){
 		look(code_raw, null, is_importing);
@@ -596,7 +642,7 @@ function add(coursecode, is_importing, should_remain){
 	}
 	var code = code_raw.substr(0,7) + "-" + code_raw.substr(-3);
 
-	if(window.jQuery && is_importing===false){
+	if(window.jQuery && onServer===true && is_importing===false){
 		$.post(
 			"check_add_func_available.php",
 			{content: code},
@@ -644,7 +690,7 @@ function clear_input(){
 	genIt();
 }
 function deleteIt(courseCode){
-	if(window.jQuery){
+	if(window.jQuery && onServer===true){
 		$.post(
 			"check_drop_func_available.php",
 			{content: courseCode},
@@ -881,7 +927,7 @@ function addIsw(){
 
 	var tmp_im_courses = content.match(/[A-Za-z]{4}[0-9]{3}( )?(\([0-9]{3}\))?/g);
 
-	if(window.jQuery){
+	if(window.jQuery && onServer===true){
 		$.post(
 			"check_isw_func_available.php",
 			{content: content},
@@ -1090,7 +1136,7 @@ function find_period_pr(starttext, endtext, day, ven){
 
 	var range = day + " " + starttext + "-" + endtext;
 
-	if(window.jQuery){
+	if(window.jQuery && onServer===true){
 		$.post(
 			"check_look_func_available.php",
 			{content: range},
@@ -1109,8 +1155,13 @@ function find_period_pr(starttext, endtext, day, ven){
 	document.getElementById("courses-list").scrollTop = scrollTopPx;
 
 	var im_courses = [];
+	var current_course_code_list = getSelectedCourseCodeList();
 
 	for(var i=0; i<courses_info.length; i++){
+
+		if(current_course_code_list.indexOf(courses_info[i].code)!==-1){
+			continue;
+		}
 
 		if(!courses_info[i].startStamp){
 			courses_info[i].startStamp = convertToStamp(courses_info[i].start);
@@ -1238,6 +1289,16 @@ function find_period_pr(starttext, endtext, day, ven){
 
 			var umacinfo_text = '<br><a href="https://umac.info/course/' + target_code_substr + '" target="_blank" class="umacinfo">前往暗黑資料庫查看評分</a>';
 
+			// if(window.jQuery){
+			// 	$.get(
+			// 		"https://umac.info/api/search/course/umac-mo/" + target_code_prof,
+			// 		{},
+			// 		function(data){
+			// 			console.log(data);
+			// 		}
+			// 	);
+			// }
+
 			if(has_more_than_one_prof === false){
 				umacinfo_text = '<br><span class="umacinfo">這科唯一的教授 The only prof of this course</span>'
 			}
@@ -1352,4 +1413,9 @@ if(localStorage["prdata"]){
 	}
 }
 
+if(localStorage["prSrchText"]){
+	document.getElementById("coursename").value = localStorage["prSrchText"];
+}
+
 genIt();
+
