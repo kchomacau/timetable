@@ -8,6 +8,18 @@
 	<meta property="og:description" content="一次過畀你睇晒 Study Plan + Timetable！" />
 </head>
 <body id="body">
+	<p>
+		<b>備註 / Note</b>
+	</p>
+	<ul class="inst">
+		<li>
+			部份 FST 課堂區分 Lab A 及 Lab B，在本表中將以 A 及 B 區分，唯實際情況下，該課時編號應為「001/LAB-LXX」。
+			<br>
+			Some courses for FST are divided two labs. "A" and "B" are used below, while the real situation should be "001/LAB-LXX".
+		</li>
+	</ul>
+	<hr class="full">
+
 	<h2>課程表助手 Timetable Helper</h2>
 	<p>by K. C. Ho</p>
 <!-- NOTE: add "Server Support" credit to Wh Tong for Non-GitHub version. -->
@@ -227,12 +239,16 @@
 	<link rel="stylesheet" href="style.css?revision=12">
 	<script src="courses.js?revision=9"></script>
 
+	<script>
+		var onServer = false;
+	</script>
+
 	<!-- <script
 	src="https://code.jquery.com/jquery-3.2.1.min.js"
 	integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
 	crossorigin="anonymous"></script> -->
 
-	<script src="script.js?revision=5"></script>
+	<script src="script.js?revision=6"></script>
 
 	<script>
 		function checkAvailable(result){
