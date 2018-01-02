@@ -103,7 +103,7 @@ div#wrapper div#overlay {
 	bottom:0;
 }
 div#wrapper div#overlay.lock {
-	z-index:99;
+	z-index:39;
 }
 div#wrapper div#overlay.unlock {
 	display: none;
@@ -230,7 +230,11 @@ a#lock, a#scroll-lock {
 	width:140px;
 	position: relative;
 }
-a#scroll-lock {
+/*a#scroll-lock {*/
+
+a#scroll-lock {display: none;}
+
+a#lock {
 	position: fixed;
 	right: 28%;
 	margin: 10px 10px 0 0;
@@ -238,8 +242,7 @@ a#scroll-lock {
 	width: 150px;
 	background: dodgerblue;
 	color:#fff;
-} {
-	display: none;
+	z-index:99;
 }
 a#scroll-lock .textunlock,
 .lockScreen a#scroll-lock .textlock {
@@ -294,7 +297,7 @@ a#lock.lock #lock-on {
 }
 a#lock.lock #lock-off,
 a#lock.unlock #lock-on {
-	color:#ccc;
+	color:#000;
 }
 a#lock.lock #lock-off {
 	left:-10px;
