@@ -925,6 +925,7 @@ function addIsw(){
 		pref_isw_value = content;
 	}
 
+	// 從文字中提取課程編號(可能包括Section Number)
 	var tmp_im_courses = content.match(/[A-Za-z]{4}[0-9]{3}( )?(\([0-9]{3}\))?/g);
 
 	if(window.jQuery && onServer===true){
@@ -936,18 +937,22 @@ function addIsw(){
 	}
 
 	var im_courses = [];
-	var had_repeat = false;
+	// var had_repeat = false;
 
 	var is_isw = content.indexOf("Compulsory Major Courses") !== -1;
+
+	var repeated_i = [];
 
 	if(tmp_im_courses){
 		for(var i=0; i<tmp_im_courses.length; i++){
 
+			// 部份課程會在一個或多個領域出現, 要去掉重覆的課程
 			if(im_courses.indexOf(tmp_im_courses[i]) === -1){
 				im_courses.push(tmp_im_courses[i]);
 			}
 			else{
-				had_repeat = true;
+				// had_repeat = true;
+				repeated_i.push(i);
 			}
 		}
 	}
@@ -967,20 +972,29 @@ function addIsw(){
 
 		var im_courses_detail = content.match(/[A-Za-z]{4}[0-9]{3}[^\n]*/g);
 
+		// 上面去掉了重覆的課程, 這裡也要一同去掉
+		for(var c=0; c<repeated_i.length; c++){
+			im_courses_detail.splice(repeated_i[c], 1);
+		}
+
 		finding_period = false;
 
 		studyPlanLink.style.display = "block";
 		studyPlanDiv.innerHTML = "<hr class='full'><p><b>可選擇的課程列表 Available Courses List</b></p><p>&nbsp;</p>";
 
+		// console.log("im_courses", im_courses);
+
 		for(var i=im_courses.length-1; i>=0; i--){
 			if(im_courses.indexOf(im_courses[i]) < i){
 				im_courses.splice(i, 1);
+				im_courses_detail.splice(i, 1);
 			}
 			else if(
 				im_courses_detail[i].indexOf(")Completed")!==-1
 				|| im_courses_detail[i].indexOf(")In Progress")!==-1
 			){
 				im_courses.splice(i, 1);
+				im_courses_detail.splice(i, 1);
 			}
 			else{
 				var cs_found = false;
@@ -993,6 +1007,7 @@ function addIsw(){
 
 				if(cs_found===false){
 					im_courses.splice(i,1);
+					im_courses_detail.splice(i, 1);
 				}
 				else{
 					im_courses[i] = {
@@ -1002,6 +1017,8 @@ function addIsw(){
 				}
 			}
 		}
+
+		// console.log("im_courses", im_courses);
 
 		for(var i=0; i<im_courses.length; i++){
 			var p = document.createElement("p");
