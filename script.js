@@ -926,7 +926,7 @@ function addIsw(){
 	}
 
 	// 從文字中提取課程編號(可能包括Section Number)
-	var tmp_im_courses = content.match(/[A-Za-z]{4}[0-9]{3}( )?(\([0-9]{3}\))?/g);
+	var tmp_im_courses = content.match(/[A-Za-z]{4}[0-9]{3}(\/002\/003)?( )?(\([0-9]{3}\))?/g);
 
 	if(window.jQuery && onServer===true){
 		$.post(
