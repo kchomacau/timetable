@@ -468,6 +468,18 @@ p.br {
 	.min-only {
 		display: none !important;
 	}
+	
+	p.br {
+		padding: 0 15px;
+	}
+	p.br a {
+		padding: 13px 7px;
+		display: inline-block;
+	}
+	a#lock {
+		position: relative;
+		right: auto;
+	}
 }
 
 p.alink {
