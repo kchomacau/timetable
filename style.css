@@ -102,12 +102,17 @@ div#wrapper div#overlay {
 	right:0;
 	bottom:0;
 }
-div#wrapper div#overlay.lock {
+/* div#wrapper div#overlay.lock {
 	z-index:39;
 }
 div#wrapper div#overlay.unlock {
 	display: none;
+} */
+
+div#wrapper div#overlay {
+	display: none;
 }
+
 span.cross,
 span.alt-text {
 	font-size: 36px;
