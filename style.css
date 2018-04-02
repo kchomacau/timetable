@@ -234,7 +234,7 @@ a#lock, a#scroll-lock {
 
 a#scroll-lock {display: none;}
 
-a#lock {
+/* a#lock {
 	position: fixed;
 	right: 28%;
 	margin: 10px 10px 0 0;
@@ -243,7 +243,10 @@ a#lock {
 	background: dodgerblue;
 	color:#fff;
 	z-index:99;
-}
+} */
+
+a#lock {display: none;}
+
 a#scroll-lock .textunlock,
 .lockScreen a#scroll-lock .textlock {
 	display: none;
@@ -452,7 +455,7 @@ p.br {
 	p.br {
 		right:28%;
 		margin:10px;
-		top:58px;
+		/* top:58px; */
 	}
 	.max-only {
 		display: none !important;
