@@ -1042,8 +1042,12 @@ function addIsw(){
 			else{
 				var cs_found = false;
 				var ci;
+				var cc_substr;
 				for(ci=0; ci<courses_info.length; ci++){
-					if(courses_info[ci].code.substr(0,course_code_length) === im_courses[i]
+
+					cc_substr = courses_info[ci].code.substr(0,course_code_length);
+
+					if(cc_substr === im_courses[i]
 						|| courses_info[ci].name.indexOf(im_courses[i])>-1){
 						cs_found = true;
 						break;
@@ -1056,7 +1060,7 @@ function addIsw(){
 				}
 				else{
 					im_courses[i] = {
-						code: courses_info[ci].code,
+						code: cc_substr,
 						text: courses_info[ci].name
 					};
 				}
@@ -1480,4 +1484,3 @@ if(localStorage["prSrchText"]){
 }
 
 genIt();
-
