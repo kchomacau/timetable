@@ -1,6 +1,23 @@
 var timetable = document.getElementById("timetable");
 var template = timetable.innerHTML;
 var finding_period = false;
+
+
+
+var course_code_length = 8;
+var course_sec_length = 3;
+var course_total_length = course_code_length + 1 + course_sec_length;
+
+
+function match_course(content, with_section){
+
+	if(with_section===true){
+		return content.match(/[A-Za-z]{4}[0-9]{4}((\/[0-9]{3})*)?( )?(\([0-9]{3}\))?/g);
+	}
+	return content.match(/[A-Za-z]{4}[0-9]{4}[^\n]*/g)
+}
+
+
 var courses = [
 ];
 var allCourseMode = false;
@@ -106,7 +123,7 @@ function changeValue(courseCode){
 }
 var urlParam = window.location.search;
 if(urlParam.indexOf("course=") > -1){
-	var courseCode_param = urlParam.substr(urlParam.indexOf("course=")+7, 7);
+	var courseCode_param = urlParam.substr(urlParam.indexOf("course=")+7, course_code_length);
 	changeValue(courseCode_param);
 	add(courseCode_param);
 	hasUrlParam = true;
@@ -571,7 +588,7 @@ function look(coursecode, is_error, is_importing){
 	var courses_list_tmp = [];
 
 	for(var i=0; i<courses_info.length; i++){
-		if(courses_info[i].code.substr(0,7) === coursecode){
+		if(courses_info[i].code.substr(0,course_code_length) === coursecode){
 			// && courses_list_current.indexOf(courses_info[i].code)===-1){
 			courses_list_tmp.push(courses_info[i]);
 		}
@@ -640,7 +657,7 @@ function add(coursecode, is_importing, should_remain){
 		look(code_raw, null, is_importing);
 		return;
 	}
-	var code = code_raw.substr(0,7) + "-" + code_raw.substr(-3);
+	var code = code_raw.substr(0,course_code_length) + "-" + code_raw.substr(-course_sec_length);
 
 	if(window.jQuery && onServer===true && is_importing===false){
 		$.post(
@@ -672,7 +689,7 @@ function add(coursecode, is_importing, should_remain){
 		}
 	}
 	if(count === 0){
-		return look(code_raw.substr(0,7), true, is_importing);
+		return look(code_raw.substr(0,course_code_length), true, is_importing);
 	}
 	else{
 
@@ -775,7 +792,7 @@ function fetchIt(){
 			|| match_content_index >= 0
 			|| match_prof_index >= 0){
 
-			var coursecode = courses_info[i].code.substr(0, 7);
+			var coursecode = courses_info[i].code.substr(0, course_code_length);
 
 			if(added.indexOf(coursecode) === -1
 				&& added_last.indexOf(coursecode) === -1
@@ -926,7 +943,7 @@ function addIsw(){
 	}
 
 	// 從文字中提取課程編號(可能包括Section Number)
-	var tmp_im_courses = content.match(/[A-Za-z]{4}[0-9]{3}((\/[0-9]{3})*)?( )?(\([0-9]{3}\))?/g);
+	var tmp_im_courses = match_course(content, true);
 
 	if(window.jQuery && onServer===true){
 		$.post(
@@ -970,7 +987,7 @@ function addIsw(){
 	else if(is_isw){
 		// is study plan
 
-		var im_courses_detail = content.match(/[A-Za-z]{4}[0-9]{3}[^\n]*/g);
+		var im_courses_detail = match_course(content);
 
 		// 上面去掉了重覆的課程, 這裡也要一同去掉
 		for(var c=0; c<repeated_i.length; c++){
@@ -999,7 +1016,7 @@ function addIsw(){
 			else{
 				var cs_found = false;
 				for(var ci=0; ci<courses_info.length; ci++){
-					if(courses_info[ci].code.substr(0,7) === im_courses[i]){
+					if(courses_info[ci].code.substr(0,course_code_length) === im_courses[i]){
 						cs_found = true;
 						break;
 					}
@@ -1012,7 +1029,7 @@ function addIsw(){
 				else{
 					im_courses[i] = {
 						code: im_courses[i],
-						text: im_courses_detail[i].substr(7)
+						text: im_courses_detail[i].substr(course_code_length)
 					};
 				}
 			}
@@ -1255,7 +1272,7 @@ function find_period_pr(starttext, endtext, day, ven){
 
 
 		var has_more_than_one_prof = false;
-		var target_code_substr = im_courses[i].code.substr(0,7);
+		var target_code_substr = im_courses[i].code.substr(0,course_code_length);
 		var target_code_prof   = im_courses[i].prof;
 
 		for(var jx in courses_info){
@@ -1265,7 +1282,7 @@ function find_period_pr(starttext, endtext, day, ven){
 			if(ths.code !== im_courses[i].code){
 
 				// if same class, different section
-				if(ths.code.substr(0,7) === target_code_substr
+				if(ths.code.substr(0,course_code_length) === target_code_substr
 					&& ths.prof !== target_code_prof){
 					has_more_than_one_prof = true;
 				}
