@@ -1349,7 +1349,7 @@ function find_period_pr(starttext, endtext, day, ven){
 
 			// console.log(target_code_substr);
 
-			var umacinfo_text = '<br><a href="https://umac.info/course/' + target_code_substr + '" target="_blank" class="umacinfo">前往暗黑資料庫查看評分</a>';
+			var umacinfo_text = '<br><a href="https://rateprof.tk/course/umac-mo/' + target_code_substr + '" target="_blank" class="umacinfo">前往暗黑資料庫查看評分</a>';
 
 			// if(window.jQuery){
 			// 	$.get(
