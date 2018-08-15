@@ -6,7 +6,6 @@ var finding_period = false;
 
 var course_code_length = 8;
 var course_sec_length = 3;
-var course_total_length = course_code_length + 1 + course_sec_length;
 
 
 function match_course(content, with_section){
@@ -678,7 +677,7 @@ function add(coursecode, is_importing, should_remain){
 	document.getElementById("coursename").value = code_raw;
 	localStorage["prSrchText"] = code_raw;
 
-	if(code_raw.length < course_total_length){
+	if(code_raw.length < (course_code_length + course_sec_length)){
 		look(code_raw, null, is_importing);
 		return;
 	}
