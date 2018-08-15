@@ -12,9 +12,9 @@ var course_total_length = course_code_length + 1 + course_sec_length;
 function match_course(content, with_section){
 
 	if(with_section===true){
-		return content.match(/[A-Za-z]{4}[0-9]{4}((\/[0-9]{3})*)?( )?(\([0-9]{3}\))?/g);
+		return content.match(/[A-Za-z]{4}[0-9]{3,4}((\/[0-9]{3})*)?( )?(\([0-9]{3}\))?/g);
 	}
-	return content.match(/[A-Za-z]{4}[0-9]{4}[^\n]*/g)
+	return content.match(/[A-Za-z]{4}[0-9]{3,4}[^\n]*/g);
 }
 
 
@@ -588,6 +588,8 @@ function look(coursecode, is_error, is_importing){
 	var courses_list_tmp = [];
 
 	for(var i=0; i<courses_info.length; i++){
+		// console.log(courses_info[i].code.substr(0,course_code_length), coursecode);
+
 		if(courses_info[i].code.substr(0,course_code_length) === coursecode){
 			// && courses_list_current.indexOf(courses_info[i].code)===-1){
 			courses_list_tmp.push(courses_info[i]);
@@ -653,7 +655,7 @@ function add(coursecode, is_importing, should_remain){
 	document.getElementById("coursename").value = code_raw;
 	localStorage["prSrchText"] = code_raw;
 
-	if(code_raw.length < 8){
+	if(code_raw.length < course_total_length){
 		look(code_raw, null, is_importing);
 		return;
 	}
@@ -683,6 +685,7 @@ function add(coursecode, is_importing, should_remain){
 	}
 	var count = 0;
 	for(var i=0; i<courses_info.length; i++){
+		// console.log(courses_info[i].code, code);
 		if(courses_info[i].code === code){
 			courses.push(courses_info[i]);
 			count++;
@@ -1015,8 +1018,10 @@ function addIsw(){
 			}
 			else{
 				var cs_found = false;
-				for(var ci=0; ci<courses_info.length; ci++){
-					if(courses_info[ci].code.substr(0,course_code_length) === im_courses[i]){
+				var ci;
+				for(ci=0; ci<courses_info.length; ci++){
+					if(courses_info[ci].code.substr(0,course_code_length) === im_courses[i]
+						|| courses_info[ci].name.indexOf(im_courses[i])>-1){
 						cs_found = true;
 						break;
 					}
@@ -1028,8 +1033,8 @@ function addIsw(){
 				}
 				else{
 					im_courses[i] = {
-						code: im_courses[i],
-						text: im_courses_detail[i].substr(course_code_length)
+						code: courses_info[ci].code,
+						text: courses_info[ci].name
 					};
 				}
 			}
@@ -1059,86 +1064,86 @@ function addIsw(){
 
 var totalSort = {};
 
-function draw_diagram(less_arr_fromObj, color){
+// function draw_diagram(less_arr_fromObj, color){
 
-	var str_l = "";
+// 	var str_l = "";
 
-	less_arr_fromObj.sort(function(a,b){
-		return convertToStamp(a.timeslot) - convertToStamp(b.timeslot);
-	})
+// 	less_arr_fromObj.sort(function(a,b){
+// 		return convertToStamp(a.timeslot) - convertToStamp(b.timeslot);
+// 	})
 
 
-	for(var i in less_arr_fromObj){
-		str_l += "<br><small>" + less_arr_fromObj[i].timeslot + " - " + less_arr_fromObj[i].count + " 節</small>";
+// 	for(var i in less_arr_fromObj){
+// 		str_l += "<br><small>" + less_arr_fromObj[i].timeslot + " - " + less_arr_fromObj[i].count + " 節</small>";
 
-	// 把每座大樓都Loop一次
-		var count_total = 0;
-		var count_total_obj = [];
+// 	// 把每座大樓都Loop一次
+// 		var count_total = 0;
+// 		var count_total_obj = [];
 
-		var max_percent = 0;
-		var max_count = 0;
+// 		var max_percent = 0;
+// 		var max_count = 0;
 
-		for(var j in less_arr_fromObj[i]){
-			if(j !== "timeslot" && j !== "count"){
-				count_total++;
+// 		for(var j in less_arr_fromObj[i]){
+// 			if(j !== "timeslot" && j !== "count"){
+// 				count_total++;
 
-				var thscount = parseInt(less_arr_fromObj[i][j]);
-				var count_wholeBuilding = parseInt(less_arr_fromObj[i].count);
+// 				var thscount = parseInt(less_arr_fromObj[i][j]);
+// 				var count_wholeBuilding = parseInt(less_arr_fromObj[i].count);
 
-				var percent = (thscount / count_wholeBuilding).toFixed(1);
+// 				var percent = (thscount / count_wholeBuilding).toFixed(1);
 
-				count_total_obj.push({
-					venue: j,
-					perc: percent,
-					count: thscount
-				});
+// 				count_total_obj.push({
+// 					venue: j,
+// 					perc: percent,
+// 					count: thscount
+// 				});
 
-				if(!totalSort[j]){
-					totalSort[j] = 0;
-				}
-				totalSort[j] += thscount;
+// 				if(!totalSort[j]){
+// 					totalSort[j] = 0;
+// 				}
+// 				totalSort[j] += thscount;
 
-				if(thscount > max_count){
-					max_percent = percent;
-					max_count = thscount;
-				}
-			}
-		}
+// 				if(thscount > max_count){
+// 					max_percent = percent;
+// 					max_count = thscount;
+// 				}
+// 			}
+// 		}
 
-		str_l += '<div>';
+// 		str_l += '<div>';
 
-		// 左邊文字佔據 30%.
-		var total_width = (100-30);	// in percent
+// 		// 左邊文字佔據 30%.
+// 		var total_width = (100-30);	// in percent
 
-		if(max_count < 10){
-			total_width = 30;	// in percent
-		}
+// 		if(max_count < 10){
+// 			total_width = 30;	// in percent
+// 		}
 
-		// 按課堂數量多少,倒序排列
-		count_total_obj.sort(function(a,b){return b.perc - a.perc});
+// 		// 按課堂數量多少,倒序排列
+// 		count_total_obj.sort(function(a,b){return b.perc - a.perc});
 
-		for(v in count_total_obj){
+// 		for(v in count_total_obj){
 
-			console.log(total_width, count_total_obj[v].perc, max_percent, total_width * count_total_obj[v].perc / max_percent);
+// 			console.log(total_width, count_total_obj[v].perc, max_percent, total_width * count_total_obj[v].perc / max_percent);
 
-			var bar_width = parseInt(total_width * count_total_obj[v].perc / max_percent);
-			var bar_height = 20;
+// 			var bar_width = parseInt(total_width * count_total_obj[v].perc / max_percent);
+// 			var bar_height = 20;
 
-			if(bar_width < 2){
-				bar_width = 2;
-			}
+// 			if(bar_width < 2){
+// 				bar_width = 2;
+// 			}
 
-			str_l += '<div><div style="width:' + 28 + '%;padding-right:' + 2 + '%;display:inline-block;vertical-align:middle;text-align:right;color:'+color+';font-size:13px;font-weight:bold;">' + count_total_obj[v].venue + ' / ' + count_total_obj[v].count + '</div>'
-			 + '<div style="width:' + bar_width + '%;height:' + bar_height + 'px;display:inline-block;margin:3px 0;background:'+color+';vertical-align:middle"></div></div>';
-		}
+// 			str_l += '<div><div style="width:' + 28 + '%;padding-right:' + 2 + '%;display:inline-block;vertical-align:middle;text-align:right;color:'+color+';font-size:13px;font-weight:bold;">' + count_total_obj[v].venue + ' / ' + count_total_obj[v].count + '</div>'
+// 			 + '<div style="width:' + bar_width + '%;height:' + bar_height + 'px;display:inline-block;margin:3px 0;background:'+color+';vertical-align:middle"></div></div>';
+// 		}
 
-		str_l += '</div>';
-	}
+// 		str_l += '</div>';
+// 	}
 
-	console.log(totalSort);
+// 	console.log(totalSort);
 
-	return str_l;
-}
+// 	return str_l;
+// }
 
 
 
@@ -1229,8 +1234,8 @@ function find_period_pr(starttext, endtext, day, ven){
 		studyPlanDiv.innerHTML += '<p>共有 ' + (im_courses.length) + ' 節課</p>';
 
 		var div = document.createElement("div");
-		var less_arr = {};
-		var less_arr_2 = {};
+		// var less_arr = {};
+		// var less_arr_2 = {};
 
 		for(var i=0; i<im_courses.length; i++){
 			var p = document.createElement("p");
@@ -1245,29 +1250,29 @@ function find_period_pr(starttext, endtext, day, ven){
 			var venue = im_courses[i].venue.split("-")[0];
 
 		// 計算該時間段的課堂數量
-			if(!less_arr[key]){
-				less_arr[key] = {count: 0};
-			}
-			less_arr[key].count++;
+			// if(!less_arr[key]){
+			// 	less_arr[key] = {count: 0};
+			// }
+			// less_arr[key].count++;
 
 		// 計算該時間段、同一地點的課堂數量
-			if(!less_arr[key][venue]){
-				less_arr[key][venue] = 0;
-			}
-			less_arr[key][venue]++;
+			// if(!less_arr[key][venue]){
+			// 	less_arr[key][venue] = 0;
+			// }
+			// less_arr[key][venue]++;
 
 		// 計落課
 			var key = im_courses[i].end;
 
-			if(!less_arr_2[key]){
-				less_arr_2[key] = {count: 0};
-			}
-			less_arr_2[key].count++;
+			// if(!less_arr_2[key]){
+			// 	less_arr_2[key] = {count: 0};
+			// }
+			// less_arr_2[key].count++;
 
-			if(!less_arr_2[key][venue]){
-				less_arr_2[key][venue] = 0;
-			}
-			less_arr_2[key][venue]++;
+			// if(!less_arr_2[key][venue]){
+			// 	less_arr_2[key][venue] = 0;
+			// }
+			// less_arr_2[key][venue]++;
 
 
 
@@ -1358,27 +1363,27 @@ function find_period_pr(starttext, endtext, day, ven){
 
 
 	// 將object變成array
-		var less_arr_fromObj = [];
-		for(var i in less_arr){
-			less_arr[i].timeslot = i;
-			less_arr_fromObj.push(less_arr[i]);
-		}
-		var less_arr_2_fromObj = [];
-		for(var i in less_arr_2){
-			less_arr_2[i].timeslot = i;
-			less_arr_2_fromObj.push(less_arr_2[i]);
-		}
+		// var less_arr_fromObj = [];
+		// for(var i in less_arr){
+		// 	less_arr[i].timeslot = i;
+		// 	less_arr_fromObj.push(less_arr[i]);
+		// }
+		// var less_arr_2_fromObj = [];
+		// for(var i in less_arr_2){
+		// 	less_arr_2[i].timeslot = i;
+		// 	less_arr_2_fromObj.push(less_arr_2[i]);
+		// }
 
 	// 結果拼成字串
-		var str_l = "<p>&nbsp;</p><p><b>時間及地點分佈 Distribution</b></p>";
+		// var str_l = "<p>&nbsp;</p><p><b>時間及地點分佈 Distribution</b></p>";
 
-		str_l += "<small>(上課 Begin at)</small>" + draw_diagram(less_arr_fromObj, "limegreen");
-		str_l += "<br>&nbsp;<br><small>(下課 End at)</small>" + draw_diagram(less_arr_2_fromObj, "salmon");
+		// str_l += "<small>(上課 Begin at)</small>" + draw_diagram(less_arr_fromObj, "limegreen");
+		// str_l += "<br>&nbsp;<br><small>(下課 End at)</small>" + draw_diagram(less_arr_2_fromObj, "salmon");
 
-		studyPlanDiv.appendChild(div);
+		// studyPlanDiv.appendChild(div);
 
-		studyPlanDiv.innerHTML += '<p><span id="splist"></span></p>';
-		document.getElementById("splist").innerHTML = str_l;
+		// studyPlanDiv.innerHTML += '<p><span id="splist"></span></p>';
+		// document.getElementById("splist").innerHTML = str_l;
 	}
 }
 
