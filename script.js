@@ -590,11 +590,34 @@ function look(coursecode, is_error, is_importing){
 	for(var i=0; i<courses_info.length; i++){
 		// console.log(courses_info[i].code.substr(0,course_code_length), coursecode);
 
-		if(courses_info[i].code.substr(0,course_code_length) === coursecode){
+		if(courses_info[i].code.substr(0,course_code_length) === coursecode.substr(0,course_code_length)){
 			// && courses_list_current.indexOf(courses_info[i].code)===-1){
 			courses_list_tmp.push(courses_info[i]);
 		}
 	}
+	if(courses_list_tmp.length < 1) {
+		// 可能是舊制
+
+		var cur_target = '';
+
+		for(var ci=0; ci<courses_info.length; ci++){
+
+			if(cur_target !== '') {
+				if(courses_info[ci].code.substr(0,course_code_length) === coursecode.substr(0,course_code_length)){
+					// && courses_list_current.indexOf(courses_info[ci].code)===-1){
+					courses_list_tmp.push(courses_info[ci]);
+				}
+			}
+			else{
+				if(courses_info[ci].name.indexOf(coursecode.substr(0,7))>-1){
+					cur_target = courses_info[ci].code;
+					courses_list_tmp.push(courses_info[ci]);
+				}
+			}
+		}
+	}
+
+
 	if(courses_list_tmp.length < 1){
 		print_error(coursecode+": 課程不存在 / Course not found.");
 	}
