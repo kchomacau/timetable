@@ -715,3 +715,13 @@ a.umacinfo:after {
 	}
 }
 
+
+@media screen and (max-width:799px){
+	body {padding-top: 80px;}
+}
+
+p.br { padding: 5px 10px; }
+p.br a { padding: 0; }
+p.br a img { height: 23px; padding: 5px 15px; vertical-align: middle; }
+
+
