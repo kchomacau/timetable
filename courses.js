@@ -19,12 +19,6 @@ var colors = [
 ];
 
 var courses_info = [
-
-
-
-
-
-{code:"
 {code:"CHLL1000",name:"UNIVERSITY CHINESE (=former FAH-DCH-CHNB100)",prof:"PANG HOI LING (in Cantonese)",type:"Lecture",day:"TUE",start:"14:30",end:"15:45",remark:"",venue:"E22-1011",host:"FAH-DCH"},
 {code:"CHLL1000",name:"UNIVERSITY CHINESE (=former FAH-DCH-CHNB100)",prof:"PANG HOI LING (in Cantonese)",type:"Lecture",day:"FRI",start:"14:30",end:"15:45",remark:"",venue:"E22-1011",host:"FAH-DCH"},
 {code:"CHLL1000",name:"UNIVERSITY CHINESE (=former FAH-DCH-CHNB100)",prof:"CHEONG IM LAN (in Mandarin)",type:"Lecture",day:"MON",start:"11:30",end:"12:45",remark:"",venue:"E21-1031",host:"FAH-DCH"},
