@@ -13,8 +13,23 @@ function match_course(content, with_section){
 	if(with_section===true){
 		return content.match(/[A-Za-z]{4}[0-9]{3,4}((\/[0-9]{3})*)?( )?(\([0-9]{3}\))?/g);
 	}
-	return content.match(/[A-Za-z]{4}[0-9]{3,4}[^\n]*/g);
+	return null; // content.match(/[A-Za-z]{4}[0-9]{3,4}[^\n]*/g);
 }
+
+function match_course_with_index(content) {
+
+	var result = [];
+	var regex = /[A-Za-z]{4}[0-9]{3,4}[^\n]*/g;
+
+	while((match = regex.exec(content)) !== null) {
+		result.push({
+			index: match.index,
+			info: match[0]
+		});
+	}
+	return result;
+}
+
 
 
 var courses = [
@@ -983,21 +998,24 @@ function addIsw(){
 
 	var is_isw = content.indexOf("Compulsory Major Courses") !== -1;
 
-	var repeated_i = [];
+	// var repeated_i = [];
+	// 
+	// if(tmp_im_courses){
+	// 	for(var i=0; i<tmp_im_courses.length; i++){
+	// 
+	// 		// 部份課程會在一個或多個領域出現, 要去掉重覆的課程
+	// 		if(im_courses.indexOf(tmp_im_courses[i]) === -1){
+	// 			im_courses.push(tmp_im_courses[i]);
+	// 		}
+	// 		else{
+	// 			// had_repeat = true;
+	// 			repeated_i.push(i);
+	// 		}
+	// 	}
+	// }
 
-	if(tmp_im_courses){
-		for(var i=0; i<tmp_im_courses.length; i++){
-
-			// 部份課程會在一個或多個領域出現, 要去掉重覆的課程
-			if(im_courses.indexOf(tmp_im_courses[i]) === -1){
-				im_courses.push(tmp_im_courses[i]);
-			}
-			else{
-				// had_repeat = true;
-				repeated_i.push(i);
-			}
-		}
-	}
+	// 新 - 保留重覆
+	im_courses = tmp_im_courses;
 
 	if(im_courses.length === 0){
 		return print_error("您複製的文字中並未包含任何課程編號 / No course code is included in the copied text.");
@@ -1012,11 +1030,83 @@ function addIsw(){
 	else if(is_isw){
 		// is study plan
 
-		var im_courses_detail = match_course(content);
+		var course_categories = [];
+		var regex = /((in)?complete)\s+([a-z]{2})\t/ig;
+
+		while((match = regex.exec(content)) !== null) {
+			course_categories.push({
+				index: match.index,
+				completed: match[2]===undefined,
+				cat_code: match[3]
+			});
+			// console.log(match);
+		}
+
+		var course_categories_smaller = [];
+		var regex = /([^\n]+)\n([^\n]*\n)?[^\n]*[0-9]{1,2} credit(s)?/ig;
+
+		while((match = regex.exec(content)) !== null) {
+
+			var this_title = match[1].trim();
+
+			if(this_title===''){
+				this_title = match[2].trim();
+			}
+
+			if(this_title.indexOf("credit") > -1) {
+				// skip.
+			}
+			else{
+				course_categories_smaller.push({
+					index: match.index,
+					title: this_title
+				});
+			}
+		}
+
+		var im_courses_detail = match_course_with_index(content);
 
 		// 上面去掉了重覆的課程, 這裡也要一同去掉
-		for(var c=0; c<repeated_i.length; c++){
-			im_courses_detail.splice(repeated_i[c], 1);
+		// for(var c=0; c<repeated_i.length; c++){
+		// 	im_courses_detail.splice(repeated_i[c], 1);
+		// }
+
+		// 將已修畢的領域去除
+		var rid = 0;
+		for(var cid=0; cid<course_categories.length; cid++) {
+
+			var max;
+
+			if(!course_categories[cid+1]) {
+				max = content.length;
+			}
+			else {
+				// 以下一分類為終止界
+				max = course_categories[cid+1].index;
+			}
+
+			// 一開始的 rid 是本分類的首項
+			while(rid < im_courses_detail.length) {
+
+				// 若課程的 indexOf 比下一終止界小
+				if(im_courses_detail[rid].index < max) {
+
+					if(course_categories[cid].completed === false) {
+						// 若本分類未修畢
+
+						im_courses_detail[rid].cat_code = course_categories[cid].cat_code;
+					}
+					else{
+						// 否則，已修畢的則不顯示了
+						im_courses_detail[rid] = null;
+					}
+				}
+				else {
+					break;
+				}
+
+				rid++;
+			}
 		}
 
 		finding_period = false;
@@ -1027,13 +1117,16 @@ function addIsw(){
 		// console.log("im_courses", im_courses);
 
 		for(var i=im_courses.length-1; i>=0; i--){
-			if(im_courses.indexOf(im_courses[i]) < i){
-				im_courses.splice(i, 1);
-				im_courses_detail.splice(i, 1);
-			}
-			else if(
-				im_courses_detail[i].indexOf(")Completed")!==-1
-				|| im_courses_detail[i].indexOf(")In Progress")!==-1
+			// if(im_courses.indexOf(im_courses[i]) < i){
+			// 	// 本課程第二次出現
+			// 	im_courses.splice(i, 1);
+			// 	im_courses_detail.splice(i, 1);
+			// }
+			// else
+				if(
+				im_courses_detail[i] === null
+				|| im_courses_detail[i].info.indexOf(")Completed")!==-1
+				|| im_courses_detail[i].info.indexOf(")In Progress")!==-1
 			){
 				im_courses.splice(i, 1);
 				im_courses_detail.splice(i, 1);
@@ -1058,10 +1151,21 @@ function addIsw(){
 					im_courses_detail.splice(i, 1);
 				}
 				else{
+					var parent_cat_index = content.lastIndexOf("credit", im_courses_detail[i].index);
+					var cat_title = '';
+
+					for(var cik=course_categories_smaller.length-1; cik>=0; cik--) {
+						if(course_categories_smaller[cik].index < parent_cat_index) {
+							cat_title = course_categories_smaller[cik].title;
+							break;
+						}
+					}
+
 					im_courses[i] = {
 						code: cc_substr,
-						text: courses_info[ci].name
+						text: courses_info[ci].name + "<br><span style='color: #ccc'>" + im_courses_detail[i].cat_code + ': ' + cat_title + "</span>"
 					};
+
 				}
 			}
 		}
