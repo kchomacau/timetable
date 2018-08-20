@@ -1174,7 +1174,7 @@ function addIsw(){
 
 		for(var i=0; i<im_courses.length; i++){
 			var p = document.createElement("p");
-			p.innerHTML = '<a href="javascript:add(\'' + im_courses[i].code + '\',null,true)">' +
+			p.innerHTML = '<a href="javascript:add(\'' + im_courses[i].code + '\',null,false)">' +
 				'<b>' + im_courses[i].code + '</b><br><small>' + im_courses[i].text + '</small></a>';
 
 			studyPlanDiv.appendChild(p);
