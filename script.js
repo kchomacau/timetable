@@ -1124,7 +1124,8 @@ function addIsw(){
 			// }
 			// else
 				if(
-				im_courses_detail[i] === null
+				!im_courses_detail[i]
+				|| !im_courses_detail[i].info
 				|| im_courses_detail[i].info.indexOf(")Completed")!==-1
 				|| im_courses_detail[i].info.indexOf(")In Progress")!==-1
 			){
