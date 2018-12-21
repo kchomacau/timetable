@@ -1487,7 +1487,7 @@ function find_period_pr(starttext, endtext, day, ven){
 				stri = "<del>" + stri + "</del>";
 				stri += '<span class="warning">與 ' + conflict_arr.join(', ') + ' 衝突</span>';
 				p.innerHTML = stri + umacinfo_text;
-				div.appendChild(p);
+				studyPlanDiv.appendChild(p);
 			}
 
 		}
