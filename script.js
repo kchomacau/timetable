@@ -160,6 +160,8 @@ function addToScreen(target, el, i){
 	}, i);
 }
 
+var elCollection = [];
+
 function genIt(courses_list, no_scroll, is_ctrlZ){
 
 	if(no_scroll && no_scroll===true){
@@ -216,9 +218,14 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 	document.getElementById("morning").style.height = 0 + "px";
 	document.getElementById("night").style.height = 0 + "px";
 	document.getElementById("afternoon").style.height = 0 + "px";
+
+	elCollection = [];
+	// save divs used in timetable rendering, for giving indent.
+
 	var day = document.querySelectorAll(".col");
 	for(var i=0; i<day.length; i++){
 		day[i].style.height = totalHeight + 'px';
+		elCollection[i] = [];
 	}
 
 
@@ -332,12 +339,12 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 				// }
 			}
 			var div = document.createElement("a");
-			// if(allCourseMode === false){
+			if(allCourseMode === false){
 				div.href = "javascript:deleteIt('" + courses_list[i].code + "')";
-			// }
-			// else{
-			// 	div.href = "javascript:void(0)";
-			// }
+			}
+			else{
+				div.href = "javascript:filterIt('" + courses_list[i].code + "')";
+			}
 			div.style.top = parseInt((courses_list[i].startStamp - earliest) * heightOf1Min) + "px";
 			var divHeight = ((courses_list[i].endStamp - courses_list[i].startStamp) * heightOf1Min - 12);
 			div.style.height = parseInt(divHeight) + "px";
@@ -411,9 +418,32 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 			// var altText = document.createElement("div");
 			// altText.className = "alt";
 			// altText.innerHTML = basicHTML;
+
+
+			// Calculate indent.
+			var top = parseInt(div.style.top);
+			var bottom = top + parseInt(div.style.height);
+			var left = 0;
+
+			for(var thisEC=0; thisEC<elCollection[weekday].length; thisEC++) {
+				var el = elCollection[weekday][thisEC];
+				if(el.top <= bottom && el.bottom >= top) {
+					if(el.left >= left) {
+						left = el.left + 10;
+					}
+				}
+			}
+			elCollection[weekday].push({
+				code: courses_list[i].code,
+				background: background,
+				top: top,
+				bottom: bottom,
+				left: left
+			});
+
+			div.style.left = left + 'px';
 			div.appendChild(bgDiv);
 			// div.appendChild(altText);
-
 			addToScreen(day[weekday], div, i);
 		}
 	}
@@ -596,10 +626,59 @@ function removeError(code){
 		errorDiv.removeChild(er[el]);
 	}
 }
+
+var courses_list_tmp = [];
+
+function filterIt(coursecode) {
+	var this_cl_tmp = [coursecode];
+
+	// Day by day
+	for(var day=0; day<elCollection.length; day++) {
+
+		// courses in one day
+		for(var i=0; i<elCollection[day].length; i++) {
+
+			// if course found
+			if(elCollection[day][i].code === coursecode) {
+
+				// find conflict courses.
+				for(var j=0; j<elCollection[day].length; j++) {
+
+					// avoid same course
+					if(i !== j) {
+
+						var thisC = elCollection[day][i];
+						var thatC = elCollection[day][j];
+
+						if(thatC.bottom >= thisC.top && thatC.top <= thisC.bottom && thatC.background === '#222222') {
+							// overlap
+
+							if(this_cl_tmp.indexOf(thatC.code) === -1) {
+								this_cl_tmp.push(thatC.code);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if(this_cl_tmp.length === 1){
+		return add(coursecode);
+	}
+	for(var i = courses_list_tmp.length-1; i>=0; i-- ){ 
+
+		if(this_cl_tmp.indexOf(courses_list_tmp[i].code) === -1) {
+			courses_list_tmp.splice(i,1);
+		}
+	}
+	genIt(courses_list_tmp);
+}
+
 function look(coursecode, is_error, is_importing){
 
 	// var courses_list_current = getSelectedCourseCodeList();
-	var courses_list_tmp = [];
+	courses_list_tmp = [];
 
 	for(var i=0; i<courses_info.length; i++){
 		// console.log(courses_info[i].code.substr(0,course_code_length), coursecode);
@@ -736,7 +815,7 @@ function add(coursecode, is_importing, should_remain){
 		if(is_importing===false){
 			removeError();
 		}
-		document.getElementById("coursename").value = "";
+		// document.getElementById("coursename").value = "";
 		localStorage["lockMode"] = "unlock";
 	}
 	genIt()
