@@ -650,26 +650,34 @@ a#scroll-lock {
 }
 a.styled {
 	padding: 8px 13px;
-	background: #222;
+	/*background: #222;*/
 	color: #fff;
 	display: inline-block;
 	text-decoration: none;
 	-webkit-border-radius: 2px;
 	font-size: 13px;
-	margin:10px 0;
+	margin:-5px 0 10px;
 	white-space: nowrap;
+	vertical-align: middle;
 }
-a.styled:hover {
-	background: #555;
+a.styled#undo {
+	background: #ff865f url('undo.png') left center no-repeat;
 }
-a.styled#undo:before {
+a.styled#redo {
+	background: #9ddc54 url('redo.png') right center no-repeat;
+}
+a.styled#undo,
+a.styled#redo {
+	background-size: 36px auto;
+}
+/*a.styled#undo:before {
 	content:'＜';
 	left:-3px;
 }
 a.styled#redo:after {
 	content:'＞';
 	right: -3px;
-}
+}*/
 a.styled#undo:before,
 a.styled#redo:after {
 	position: relative;
