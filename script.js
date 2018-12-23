@@ -429,7 +429,8 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 
 			// Calculate indent.
 			var top = parseInt(div.style.top);
-			var bottom = top + parseInt(divHeight);
+			var height = parseInt(divHeight);
+			var bottom = top + height;
 			var left = 0;
 
 			for(var thisEC=0; thisEC<elCollection[weekday].length; thisEC++) {
@@ -438,8 +439,13 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 					if(el.left >= left) {
 						left = el.left + 10;
 					}
-					if(el.paddingTop >= paddingTop) {
-						paddingTop = el.paddingTop + 3;
+					if(el.paddingTop >= paddingTop){
+						if(el.paddingTop < height/3*2) {
+							paddingTop = el.paddingTop + 3;
+						}
+						else{
+							paddingTop += 3;
+						}
 					}
 				}
 			}
