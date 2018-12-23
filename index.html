@@ -68,7 +68,7 @@
 				<label for="pr-start">
 					上堂時間/Begin
 				</label>
-				<input type="text" id="pr-start" placeholder="e.g., 11:30" autocomplete="off" style="width:100px">
+				<input type="text" id="pr-start" placeholder="e.g., 09:30" autocomplete="off" style="width:100px">
 			</span>
 
 			<span class="line">
@@ -98,9 +98,9 @@
 			Note: Timetable will save in your browser. For any unexpected situation, refresh the page.
 		</li>
 		<li class="announce" style="color:#000">
-			更新日期 2018年8月15日
+			更新於 2018年12月21日
 			<br>
-			Updated on 15 Aug 2017
+			Updated on 21 Dec 2017
 		</li>
 		<li class="announce">
 			重要聲明：下面列出的課程資訊可能已經過時，本工具之作者將不會對因閣下使用下述資料而產生的一切結果負任何責任，若要查閱最新資訊請參閱 <a href="http://isw.umac.mo">http://isw.umac.mo</a> !
@@ -206,7 +206,7 @@
 			<input type="submit" value="匯入 Import">
 			<a href="javascript:loadPrevIsw()" class="button-like">查看上次內容</a>
 			<p>&nbsp;</p>
-			<p style="font-size:12px; color:#bbd4e0;">
+			<p style="font-size:12px; color:#a2a2a2;">
 				* 全選->複製 操作教學：
 				<br>
 				(a) 電腦用戶點選任意地方，按「Ctrl+A」，目標是看見選取了整個 Timetable 或 Study Plan，再按「Ctrl+C」。
@@ -214,7 +214,7 @@
 				(b) 手機用戶點選任意一個字，長按，會彈出提示，選「全選」(iOS) /「選擇全部」(Android)，再按「複製」。
 			</p>
 			<p>&nbsp;</p>
-			<p style="font-size:12px; color:#bbd4e0;">
+			<p style="font-size:12px; color:#a2a2a2;">
 				* How to Select All & Copy:
 				<br>
 				(a) Computer: Click anywhere, press "Ctrl+A". Your target is to see the whole timetable or study plan selected. Then press "Ctrl+C".
@@ -224,48 +224,46 @@
 		</form>
 	</div>
 
-	<link href="style.css?revision=17" rel="stylesheet">
-	<script src="courses.js?revision=11"></script>
+	<link href="style.css?revision=23" rel="stylesheet">
+	<script src="courses.js?revision=13"></script>
 
 	<script>
 		var onServer = false;
 	</script>
 
 	<!-- <script
-	src="https://code.jquery.com/jquery-3.2.1.min.js"
-	integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+	src="https://code.jquery.com/jquery-3.3.1.min.js"
+	integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
 	crossorigin="anonymous"></script> -->
 
-	<script src="script.js?revision=11"></script>
-
+	<script src="script.js?revision=28"></script>
 	<script>
-		function checkAvailable(result){
-			if(result==="not-available"){
-				document.body.innerHTML = "抱歉，本功能停止使用。";
-			}
-		}
+		// function checkAvailable(result){
+		// 	if(result==="not-available"){
+		// 		document.body.innerHTML = "抱歉，本功能停止使用。";
+		// 	}
+		// }
+	// if(window.jQuery){
+	// 	$.get(
+	// 		"check_func_available.php", {}, function(result){
 
-	if(window.jQuery){
-		$.get(
-			"check_func_available.php", {}, function(result){
-
-				if(result !== "not-available"){
-					$.ajax({
-						url: "script.js",
-						dataType: "script",
-						success: function(){
-							if(hasUrlParam === false){
-								genIt(null, true);
-							}
-						}
-					});
-				}
-				else{
-					document.body.innerHTML = "抱歉，本功能停止使用。";
-				}
-			}
-		);
-	}
+	// 			if(result !== "not-available"){
+	// 				$.ajax({
+	// 					url: "script.js",
+	// 					dataType: "script",
+	// 					success: function(){
+	// 						if(hasUrlParam === false){
+	// 							genIt(null, true);
+	// 						}
+	// 					}
+	// 				});
+	// 			}
+	// 			else{
+	// 				document.body.innerHTML = "抱歉，本功能停止使用。";
+	// 			}
+	// 		}
+	// 	);
+	// }
 	</script>
 
 <!-- Global site tag (gtag.js) - Google Analytics -->

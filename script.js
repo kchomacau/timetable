@@ -2,11 +2,12 @@ var timetable = document.getElementById("timetable");
 var template = timetable.innerHTML;
 var finding_period = false;
 
-
-
 var course_code_length = 8;
 var course_sec_length = 3;
 
+String.prototype.cleanup = function() {
+   return this.toLowerCase().replace(/[^a-z]+/g, "");
+}
 
 function match_course(content, with_section){
 
@@ -76,13 +77,13 @@ var totalHeight = 600;
 var lineHeight = 12;
 var dayName = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
 var dayDisp = [
-	"星期日/Sun",
-	"星期一/Mon",
-	"星期二/Tue",
-	"星期三/Wed",
-	"星期四/Thu",
-	"星期五/Fri",
-	"星期六/Sat"
+	"Sun(日)",
+	"Mon(一)",
+	"Tue(二)",
+	"Wed(三)",
+	"Thu(四)",
+	"Fri(五)",
+	"Sat(六)"
 ];
 var errorDiv = document.getElementById("error");
 var courseListDiv = document.getElementById("courselist");
@@ -161,23 +162,28 @@ function addToScreen(target, el, i){
 }
 
 var elCollection = [];
+// var lastClick = {
+// 	id: '',
+// 	hash: ''
+// };
 
 function genIt(courses_list, no_scroll, is_ctrlZ){
 
 	if(no_scroll && no_scroll===true){
-		window.scrollTo(0,0);
-		document.getElementById("courses-list").scrollTop = document.getElementById("isw-form").offsetTop;
+		// window.scrollTo(0,0);
+		// document.getElementById("courses-list").scrollTop = document.getElementById("isw-form").offsetTop;
 	}
 	else{
 
-		var target = 0;
+		// var target = 0;
 
-		if(studyPlanDiv.innerHTML !== ""){
-			target = studyPlanDiv.offsetTop;
-		}
+		// if(studyPlanDiv.innerHTML !== ""){
+		// 	target = studyPlanDiv.offsetTop;
+		// }
 
+		// window.scrollTo(0,document.getElementById("wrapper").offsetTop);
+		// document.getElementById("courses-list").scrollTop = target;
 		window.scrollTo(0,document.getElementById("wrapper").offsetTop);
-		document.getElementById("courses-list").scrollTop = target;
 	}
 
 	courseListDiv.innerHTML = "";
@@ -220,6 +226,7 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 	document.getElementById("afternoon").style.height = 0 + "px";
 
 	elCollection = [];
+	prettified = false;
 	// save divs used in timetable rendering, for giving indent.
 
 	var day = document.querySelectorAll(".col");
@@ -308,6 +315,12 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 	}
 	heightOf1Min = totalHeight / (latest - earliest);
 
+	timetable.className = (
+			(allCourseMode===true) ? "adding-course" : "selected-course"
+		);
+
+	var renderGap = 2;
+
 	for(var i=0; i<courses_list.length; i++){
 
 		if(!courses_list[i].code){
@@ -339,11 +352,12 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 				// }
 			}
 			var div = document.createElement("a");
+			var this_id = courses_list[i].code + "-" +courses_list[i].start + "-" +courses_list[i].end + "-" +courses_list[i].day;
 			if(allCourseMode === false){
 				div.href = "javascript:deleteIt('" + courses_list[i].code + "')";
 			}
 			else{
-				div.href = "javascript:filterIt('" + courses_list[i].code + "')";
+				div.href = "javascript:filterIt(" + weekday + "," + elCollection[weekday].length + ")";
 			}
 			div.style.top = parseInt((courses_list[i].startStamp - earliest) * heightOf1Min) + "px";
 			var divHeight = ((courses_list[i].endStamp - courses_list[i].startStamp) * heightOf1Min - 12);
@@ -364,14 +378,7 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 				tmpLineHeight = 9;
 				var paddingTop = 7;
 				div.innerHTML = basicHTML;
-				div.id = courses_list[i].code + "-" +courses_list[i].start + "-" +courses_list[i].end + "-" +courses_list[i].day;
-			}
-			if(paddingTop > 0){
-				div.style.paddingTop = parseInt(paddingTop) + "px";
-				div.style.height = parseInt(divHeight - paddingTop) + "px";
-			}
-			else{
-				div.style.paddingTop = "0px";
+				div.id = this_id;
 			}
 			var background = undefined;
 			if(used_colors_list[courses_list[i].code]){
@@ -422,7 +429,7 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 
 			// Calculate indent.
 			var top = parseInt(div.style.top);
-			var bottom = top + parseInt(div.style.height);
+			var bottom = top + parseInt(divHeight);
 			var left = 0;
 
 			for(var thisEC=0; thisEC<elCollection[weekday].length; thisEC++) {
@@ -431,12 +438,28 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 					if(el.left >= left) {
 						left = el.left + 10;
 					}
+					if(el.paddingTop >= paddingTop) {
+						paddingTop = el.paddingTop + 3;
+					}
 				}
 			}
+			if(paddingTop > 0){
+				div.style.paddingTop = parseInt(paddingTop) + "px";
+				div.style.height = parseInt(divHeight - paddingTop) + "px";
+			}
+			else{
+				div.style.paddingTop = "0px";
+			}
+
+			if(left > 90) {
+				left = 90;
+			}
+
 			elCollection[weekday].push({
 				code: courses_list[i].code,
 				background: background,
 				top: top,
+				paddingTop: paddingTop,
 				bottom: bottom,
 				left: left
 			});
@@ -444,9 +467,12 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 			div.style.left = left + 'px';
 			div.appendChild(bgDiv);
 			// div.appendChild(altText);
-			addToScreen(day[weekday], div, i);
+			addToScreen(day[weekday], div, i*renderGap);
 		}
 	}
+
+	var returnAt = (i+1) * renderGap;
+
 	var morning_height = 0;
 	var night_height = 0;
 	if(earliest < (13*60)){
@@ -512,7 +538,8 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 	// 	}
 	// }
 
-	for(var i=courses_list.length-1; i>=0; i--){
+	// for(var i=courses_list.length-1; i>=0; i--){
+	for(var i=0; i<courses_list.length; i++){
 
 		if(!courses_list[i].code){
 			continue;
@@ -542,6 +569,9 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 				if(i < courses.length){
 					li.className = "inactive";
 				}
+				else{
+					li.className = "inlist";
+				}
 			}
 //				courseListDiv.insertBefore(li, courseListDiv.querySelector("li"));
 			courseListDiv.appendChild(li);
@@ -559,7 +589,7 @@ if(!document.getElementById(ths_id)){
 	var li_el = document.createElement("li");
 	li_el.id = ths_id;
 
-	li_el.innerHTML += "<b>" + dayDisp[dayIndex] + " - " + ths.start + "-" + ths.end + "</b><br>" + ths.venue + " (" + ths.type + ")";
+	li_el.innerHTML += "<b>" + dayDisp[dayIndex] + " " + ths.start + "-" + ths.end + "</b><br>" + ths.venue + " (" + ths.type + ")";
 
 	// console.log(ths.code);
 
@@ -590,9 +620,47 @@ if(!document.getElementById(ths_id)){
 		used_colors = used_colors_list;
 	}
 
+	var als_count = 0;
+	var als = document.querySelectorAll("#courselist li.inlist ul");
+	
+	if(als.length===0) {
+		als = document.querySelectorAll("#courselist li ul");
+	}
 
+	for(var i=0; i<als.length; i++) {
+		if(als[i].innerHTML === ''){
+			als_count++;
+		}
+	}
+
+	var als_total = als.length;
+
+	if(als_count > 0) {
+		var als_text_chi, als_text_eng, als_text_eng_count;
+
+		als_text_eng_count = 's are ';
+
+		if(als_count === als_total) {
+			als_text_chi = '全部課程';
+			als_text_eng = 'All';
+		}
+		else{
+			als_text_chi = als_total + '個課程中有' + als_count + '個';
+			als_text_eng = als_count + ' of ' + als_total;
+
+			if(als_count===1){
+				als_text_eng_count = ' is ';
+			}
+		}
+		
+		alert('所選的' + als_text_chi + '未有上課時間 / ' + als_text_eng + ' selected course' + als_text_eng_count+ 'unscheduled.')
+	}
+
+	// if(callback_function) {
+	// 	window.setTimeout(callback_function, returnAt);
+	// }
 	if(finding_period===true){
-		return find_period();
+		return find_period(true);
 	}
 	return true;
 }
@@ -628,51 +696,149 @@ function removeError(code){
 }
 
 var courses_list_tmp = [];
+var prettified = false;
 
-function filterIt(coursecode) {
-	var this_cl_tmp = [coursecode];
+function removeElement(element) {
+	element.parentNode.removeChild(element);
+}
 
-	// Day by day
-	for(var day=0; day<elCollection.length; day++) {
+function prettifyDisp(day, elCollectionIndex){
+	prettified = true;
 
-		// courses in one day
-		for(var i=0; i<elCollection[day].length; i++) {
+	var weekday = document.querySelectorAll(".col");
+	var baseClass = "col day-col";
+	for(var i=1; i<weekday.length; i++) {
+		if(i !== day) {
+			// removeElement(weekday[i]);
+			weekday[i].className = baseClass + " other-col";
+			weekday[i].style.width = "40px";
+		}
+		else{
+			if(weekday[i].className.indexOf("active-col") !== -1){
+				// user clicked on the active day, should return add.
 
-			// if course found
-			if(elCollection[day][i].code === coursecode) {
+				return add(elCollection[i][elCollectionIndex].code);
+			}
+			weekday[i].style.width = "580px";	// 825 - 245
+			weekday[i].className = baseClass + " active-col";
+		}
+	}
+	return prettifyDisp_proc(elCollection[day]);
+}
 
-				// find conflict courses.
-				for(var j=0; j<elCollection[day].length; j++) {
+function prettifyDisp_proc(elCollection){
 
-					// avoid same course
-					if(i !== j) {
+	var other_els = document.querySelectorAll(".col.day-col.other-col a");
+	for(var i=0; i<other_els.length; i++) {
+		// other_els[i].href = "javascript:void(0)";
+		other_els[i].style.left = "0px";
+		other_els[i].style.width = "auto";
+	}
 
-						var thisC = elCollection[day][i];
-						var thatC = elCollection[day][j];
+	var total_width = parseInt(document.querySelector(".col.day-col.active-col").style.width);
+	var margins_width = 12;	// course-block margin width
 
-						if(thatC.bottom >= thisC.top && thatC.top <= thisC.bottom && thatC.background === '#222222') {
-							// overlap
+	var solvedConflicts = [];
+	var els = document.querySelectorAll(".col.day-col.active-col a");
 
-							if(this_cl_tmp.indexOf(thatC.code) === -1) {
-								this_cl_tmp.push(thatC.code);
-							}
-						}
-					}
-				}
+	for(var ths_i=0; ths_i<elCollection.length; ths_i++) {
+
+		if(solvedConflicts.indexOf(ths_i) > -1){
+			continue;
+		}
+
+		var conflicts = [];
+		var ths = elCollection[ths_i];
+
+		for(var tht_i=ths_i+1; tht_i<elCollection.length; tht_i++) {
+			var tht = elCollection[tht_i];
+			if(tht.top <= ths.bottom && tht.bottom >= ths.top) {
+				conflicts.push(tht_i);
+				solvedConflicts.push(tht_i);
+			}
+		}
+		if(conflicts.length > 0) {
+			conflicts.unshift(ths_i);
+			// console.log(total_width, total_width / conflicts.length);
+			var el_margin = 8;
+			var el_total_width = parseInt((total_width - el_margin) / conflicts.length * 10) / 10;
+			var el_width = el_total_width - margins_width - 1;
+
+			for(var i=0; i<conflicts.length; i++) {
+				els[conflicts[i]].style.width = (el_width + el_margin) + "px";
+				els[conflicts[i]].style.left = (el_total_width * i) + "px";
+				// console.log(els[conflicts[i]], conflicts[i], el_width, (el_total_width * i));
 			}
 		}
 	}
+}
 
-	if(this_cl_tmp.length === 1){
-		return add(coursecode);
-	}
-	for(var i = courses_list_tmp.length-1; i>=0; i-- ){ 
+function filterIt(day, elCollectionIndex) {
 
-		if(this_cl_tmp.indexOf(courses_list_tmp[i].code) === -1) {
-			courses_list_tmp.splice(i,1);
+
+	if(prettified === false){
+		var this_course_el = elCollection[day][elCollectionIndex];
+		var coursecode = this_course_el.code;
+		var this_cl_tmp = [coursecode];
+
+		// Day by day
+		// for(var day=0; day<elCollection.length; day++) {
+
+			// courses in one day
+			// for(var i=0; i<elCollection[day].length; i++) {
+
+				// if course found
+				// if(elCollection[day][i].code === coursecode) {
+
+					// find conflict courses.
+					for(var j=0; j<elCollection[day].length; j++) {
+
+						// avoid same course
+						if(j !== elCollectionIndex) {
+
+							var thisC = elCollection[day][elCollectionIndex];
+							var thatC = elCollection[day][j];
+
+							if(thatC.bottom >= thisC.top && thatC.top <= thisC.bottom && thatC.background === '#222222') {
+								// overlap
+
+								if(this_cl_tmp.indexOf(thatC.code) === -1) {
+									this_cl_tmp.push(thatC.code);
+									break;
+								}
+							}
+						}
+					}
+				// }
+			// }
+		// }
+
+		if(this_cl_tmp.length === 1){
+			return add(coursecode);
 		}
 	}
-	genIt(courses_list_tmp);
+	// for(var i = courses_list_tmp.length-1; i>=0; i-- ){ 
+
+	// 	if(this_cl_tmp.indexOf(courses_list_tmp[i].code) === -1) {
+	// 		courses_list_tmp.splice(i,1);
+	// 	}
+	// }
+	// return genIt(courses_list_tmp);
+	return prettifyDisp(day, elCollectionIndex);
+
+
+	// var this_hash = day +"#" + elCollectionIndex;
+	// if(lastClick.hash===this_hash){
+	// 	return add(coursecode);
+	// }
+
+	// var shouldQuit = (lastClick.id === this_id);
+	// lastClick.id = this_id;
+	// lastClick.hash = this_hash;
+
+	// if(shouldQuit===true) {
+		// return prettifyDisp();
+	// }
 }
 
 function look(coursecode, is_error, is_importing){
@@ -723,13 +889,13 @@ function look(coursecode, is_error, is_importing){
 		}
 		else{
 
-			if(window.jQuery && onServer===true){
-				$.post(
-					"check_look_func_available.php",
-					{content: coursecode},
-					checkAvailable
-				);
-			}
+			// if(window.jQuery && onServer===true){
+			// 	$.post(
+			// 		"check_look_func_available.php",
+			// 		{content: coursecode},
+			// 		checkAvailable
+			// 	);
+			// }
 
 			if(is_error && is_error===true){
 				print_error(coursecode+": 請選擇一個Section / Choose a section.", coursecode);
@@ -744,9 +910,9 @@ function look(coursecode, is_error, is_importing){
 function add(coursecode, is_importing, should_remain){
 
 	if(!(should_remain && should_remain===true)){
-		window.setTimeout(function(){
-			document.getElementById("courses-list").scrollTop = 0;
-		},300);
+		// window.setTimeout(function(){
+		// 	document.getElementById("courses-list").scrollTop = 0;
+		// },300);
 	}
 
 	if(!(is_importing && is_importing===true)){
@@ -768,7 +934,7 @@ function add(coursecode, is_importing, should_remain){
 	}
 	code_raw = code_raw.replace(/ /g, "").toUpperCase();
 
-	document.getElementById("coursename").value = code_raw;
+	document.getElementById("coursename").value = code_raw.split("-")[0];
 	localStorage["prSrchText"] = code_raw;
 
 	if(code_raw.length < (course_code_length + course_sec_length)){
@@ -777,13 +943,13 @@ function add(coursecode, is_importing, should_remain){
 	}
 	var code = code_raw.substr(0,course_code_length) + "-" + code_raw.substr(-course_sec_length);
 
-	if(window.jQuery && onServer===true && is_importing===false){
-		$.post(
-			"check_add_func_available.php",
-			{content: code},
-			checkAvailable
-		);
-	}
+	// if(window.jQuery && onServer===true && is_importing===false){
+	// 	$.post(
+	// 		"check_add_func_available.php",
+	// 		{content: code},
+	// 		checkAvailable
+	// 	);
+	// }
 
 	var existed = false;
 	for(var i=0; i<courses.length; i++){
@@ -823,16 +989,16 @@ function add(coursecode, is_importing, should_remain){
 function clear_input(){
 	document.getElementById("coursename").value = "";
 	fetchIt();
-	genIt();
+	genIt(null, true);
 }
 function deleteIt(courseCode){
-	if(window.jQuery && onServer===true){
-		$.post(
-			"check_drop_func_available.php",
-			{content: courseCode},
-			checkAvailable
-		);
-	}
+	// if(window.jQuery && onServer===true){
+	// 	$.post(
+	// 		"check_drop_func_available.php",
+	// 		{content: courseCode},
+	// 		checkAvailable
+	// 	);
+	// }
 	for(var i=courses.length-1; i>=0; i--){
 		if(courses[i].code === courseCode){
 			courses.splice(i, 1);
@@ -1064,13 +1230,13 @@ function addIsw(){
 	// 從文字中提取課程編號(可能包括Section Number)
 	var tmp_im_courses = match_course(content, true);
 
-	if(window.jQuery && onServer===true){
-		$.post(
-			"check_isw_func_available.php",
-			{content: content},
-			checkAvailable
-		);
-	}
+	// if(window.jQuery && onServer===true){
+	// 	$.post(
+	// 		"check_isw_func_available.php",
+	// 		{content: content},
+	// 		checkAvailable
+	// 	);
+	// }
 
 	var im_courses = [];
 	// var had_repeat = false;
@@ -1190,7 +1356,7 @@ function addIsw(){
 
 		finding_period = false;
 
-		studyPlanLink.style.display = "block";
+		studyPlanLink.style.display = "inline-block";
 		studyPlanDiv.innerHTML = "<hr class='full'><p><b>可選擇的課程列表 Available Courses List</b></p><p>&nbsp;</p>";
 
 		// console.log("im_courses", im_courses);
@@ -1259,7 +1425,7 @@ function addIsw(){
 
 			studyPlanDiv.appendChild(p);
 		}
-		document.getElementById("courses-list").scrollTop = studyPlanDiv.offsetTop;
+		// document.getElementById("courses-list").scrollTop = studyPlanDiv.offsetTop;
 
 	}
 	else{
@@ -1358,7 +1524,7 @@ var totalSort = {};
 
 
 
-function find_period_pr(starttext, endtext, day, ven){
+function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 
 	var start = 1;
 	var end = (23*60 + 59);
@@ -1385,23 +1551,28 @@ function find_period_pr(starttext, endtext, day, ven){
 
 	var range = day + " " + starttext + "-" + endtext;
 
-	if(window.jQuery && onServer===true){
-		$.post(
-			"check_look_func_available.php",
-			{content: range},
-			checkAvailable
-		);
-	}
+	// if(window.jQuery && onServer===true){
+	// 	$.post(
+	// 		"check_look_func_available.php",
+	// 		{content: range},
+	// 		checkAvailable
+	// 	);
+	// }
 
 	finding_period = true;
 
-	studyPlanLink.style.display = "block";
+	studyPlanLink.style.display = "inline-block";
 	studyPlanDiv.innerHTML = "<hr class='full'><p><b>可選擇的課程列表 Available Courses List</b><br><small>區間 Range: " + range + "</small></p>";
 
-	var scrollTopPx = document.getElementById("study-plan").offsetTop;
 
-	window.scrollTo(0,scrollTopPx);
-	document.getElementById("courses-list").scrollTop = scrollTopPx;
+	if(disable_scroll && disable_scroll===true){
+
+	}
+	else{
+		var scrollTopPx = document.getElementById("study-plan").offsetTop;
+		window.scrollTo(0,scrollTopPx);
+		document.getElementById("courses-list").scrollTop = scrollTopPx;
+	}
 
 	var im_courses = [];
 	var current_course_code_list = getSelectedCourseCodeList();
@@ -1548,13 +1719,15 @@ function find_period_pr(starttext, endtext, day, ven){
 			// 	);
 			// }
 
+			// var umacinfo_text = '<br><a href="javascript:getRate(\'' + target_code_substr + '\',\'' + target_code_prof.split("(in")[0].cleanup() + '\')" class="umacinfo">查看教授評分</a>';
+
 			if(has_more_than_one_prof === false){
 				umacinfo_text = '<br><span class="umacinfo">這科唯一的教授 The only prof of this course</span>'
 			}
 
 			if(conflict_arr.length === 0){
 
-				console.log(dates);
+				// console.log(dates);
 
 				stri += '<small>' + dates.join("<br>") + "</small>";
 				stri += '<span class="warning" style="background:#b8e4b8;color:#099848;">未與現有任何科目衝突 No Conflict</span>';
@@ -1568,7 +1741,6 @@ function find_period_pr(starttext, endtext, day, ven){
 				p.innerHTML = stri + umacinfo_text;
 				studyPlanDiv.appendChild(p);
 			}
-
 		}
 
 
@@ -1597,7 +1769,7 @@ function find_period_pr(starttext, endtext, day, ven){
 	}
 }
 
-function find_period(){
+function find_period(disable_scroll){
 
 	var start = document.getElementById("pr-start").value;
 	var end = document.getElementById("pr-end").value;
@@ -1625,7 +1797,7 @@ function find_period(){
 		ven: ven
 	});
 
-	find_period_pr(start, end, day, ven);
+	find_period_pr(start, end, day, ven, (disable_scroll && disable_scroll===true));
 
 }
 
