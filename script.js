@@ -319,7 +319,7 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 			(allCourseMode===true) ? "adding-course" : "selected-course"
 		);
 
-	var renderGap = 2;
+	var renderGap = 5;
 
 	for(var i=0; i<courses_list.length; i++){
 
@@ -1779,10 +1779,16 @@ function find_period(disable_scroll){
 	var real_start = "";
 	var real_end = "";
 
-	if(start.length === 5){
+	if(start.length === 4){
+		start = '0' + start;
+	}
+	if(/^[0-9]{2}:[0-9]{2}$/.test(start)) {
 		real_start = start;
 	}
-	if(end.length === 5){
+	if(end.length === 4){
+		end = '0' + end;
+	}
+	if(/^[0-9]{2}:[0-9]{2}$/.test(end)) {
 		real_end = end;
 	}
 
