@@ -410,11 +410,11 @@ ul#suggestion li a {
 	text-decoration: none;
 	font-size:12px;
 	padding:10px;
-	overflow: hidden;
+	/*overflow: hidden;
 	white-space: nowrap;
-	text-overflow: ellipsis;
+	text-overflow: ellipsis;*/
 	color:#999;
-	text-transform: lowercase;
+	/*text-transform: lowercase;*/
 }
 ul#suggestion li a:hover {
 	background:#f1f1f1;
