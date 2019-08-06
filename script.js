@@ -1089,13 +1089,13 @@ function fetchIt(){
 				&& added_last.indexOf(coursecode) === -1
 				&& added_other.indexOf(coursecode) === -1){
 
-				var coursename = courses_info[i].name;
+				var coursename = courses_info[i].name.toLowerCase();
 
 				if(match_content_index >= 0){
-					coursename = coursename.replace(input_original, "<span>"+input_original+"</span>");
+					coursename = coursename.replace(input_original.toLowerCase(), "<span>"+input_original+"</span>");
 				}
 				if(match_prof_index >= 0){
-					coursename += "<br><font style='font-weight:normal;text-transform:none'>- Prof: " + courses_info[i].prof.replace(input_original, "<span>"+input_original+"</span>") + '</span>';
+					coursename += "<br><font style='font-weight:normal;text-transform:none'>- Prof: " + courses_info[i].prof.toLowerCase().replace(input_original.toLowerCase(), "<span>"+input_original+"</span>") + '</span>';
 				}
 
 				var li = document.createElement("li");
