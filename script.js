@@ -437,16 +437,16 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 				var el = elCollection[weekday][thisEC];
 				if(el.top <= bottom && el.bottom >= top) {
 					if(el.left >= left) {
-						left = el.left + 10;
+						left = el.left + 21;
 					}
-					if(el.paddingTop >= paddingTop){
-						if(el.paddingTop < height/3*2) {
-							paddingTop = el.paddingTop + 3;
-						}
-						else{
-							paddingTop += 3;
-						}
-					}
+					// if(el.paddingTop >= paddingTop){
+					// 	if(el.paddingTop < height/3*2) {
+					// 		paddingTop = el.paddingTop + 3;
+					// 	}
+					// 	else{
+					// 		paddingTop += 3;
+					// 	}
+					// }
 				}
 			}
 			if(paddingTop > 0){
