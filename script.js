@@ -553,6 +553,10 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 		if(courses_list[i].code !== previousCourse){
 			previousCourse = courses_list[i].code;
 			var li = document.createElement("li");
+
+			var no_remark = courses_list[i].remark.replace(/\s/g, "")==="";
+			var no_dept = (courses_list[i].host && (courses_list[i].host.replace(/\s/g, "")===""));
+
 			li.innerHTML = '<h3><span style="background:' + used_colors_list[courses_list[i].code] + '"></span>' + courses_list[i].code + "</h3>" +
 							"<p>" + courses_list[i].name + "</p>" +
 							"<p><u>上課時間及地點 Time & Venue</u></p>" +
@@ -560,12 +564,17 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 							((courses_list[i].prof.replace(/\s/g, "")==="")
 								? ""
 								: "<p><u>講師 Lecturer</u><br>" + courses_list[i].prof + "</p>") +
-							(courses_list[i].host && (courses_list[i].host.replace(/\s/g, "")==="")
-								? ""
-								: "<p><u>部門 Dept</u><br>" + courses_list[i].host + "</p>") +
-							((courses_list[i].remark.replace(/\s/g, "")==="")
-								? ""
-								: "<p><u>備註 Remark</u><br>" + courses_list[i].remark.replace(/\n/g, "<br>") + "</p>") +
+							((no_dept && no_remark)
+								? ''
+								: '<p><u>備註 Remark</u>' +
+								(no_dept
+									? ''
+									: '<br>Host by ' + courses_list[i].host + '; ') +
+								(no_remark
+									? ''
+									: courses_list[i].remark.replace(/\n/g, "<br>")) +
+								'</p>'
+							) +
 							'<a href="javascript:add(\'' +courses_list[i].code+ '\')" class="add">加入 Add</a><a href="javascript:deleteIt(\'' +courses_list[i].code+ '\')" class="del">刪除 Delete</a>';
 			if(allCourseMode===true){
 
@@ -595,7 +604,7 @@ if(!document.getElementById(ths_id)){
 	var li_el = document.createElement("li");
 	li_el.id = ths_id;
 
-	li_el.innerHTML += "<b>" + dayDisp[dayIndex] + " " + ths.start + "-" + ths.end + "</b><br>" + ths.venue + " (" + ths.type + ")";
+	li_el.innerHTML += "<b>" + dayDisp[dayIndex] + " " + ths.start + "-" + ths.end + "</b><br>" + ths.venue + (ths.type==='Lecture' ? '' : " (" + ths.type + ")");
 
 	// console.log(ths.code);
 
@@ -1596,9 +1605,25 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 			courses_info[i].endStamp   = convertToStamp(courses_info[i].end);
 		}
 
-		var matched = (courses_info[i].startStamp >= start
-			&& courses_info[i].endStamp <= end
-			&& courses_info[i].day === day);
+		var matched = courses_info[i].day === day;
+
+		if(starttext === '') {
+			// end only.
+			matched = (matched
+				&& courses_info[i].endStamp <= end
+				&& courses_info[i].endStamp > (end - 60));
+		}
+		else if(endtext === '') {
+			// start only.
+			matched = (matched
+				&& courses_info[i].startStamp >= start
+				&& courses_info[i].startStamp < (start + 60));
+		}
+		else{ 
+			matched = (matched
+				&& courses_info[i].startStamp >= start
+				&& courses_info[i].endStamp <= end);
+		}
 
 		if(venue !== ""){
 			matched = matched && (courses_info[i].venue.substr(0,venue.length) === venue);
@@ -1631,6 +1656,7 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 
 			var conflict_arr = [];
 			var dates = [];
+			var dates_groupby_str = 'cl-';
 
 		// 計上課
 			var key = im_courses[i].start;
@@ -1681,7 +1707,8 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 				continue;	// skip to next loop
 			}
 
-			dates.push(dayDisp[dayName.indexOf(ths.day)] + " - " + ths.start + "-" + ths.end + " (" + ths.type + ")");
+			dates_groupby_str += ths.day + ths.start + '-' + ths.end;
+			dates.push(dayDisp[dayName.indexOf(ths.day)] + " - " + ths.start + "-" + ths.end + (ths.type==='Lecture' ? '' : " (" + ths.type + ")"));
 
 			// stri += "<br><small>";
 			// stri += dayDisp[dayName.indexOf(ths.day)] + " - " + ths.start + "-" + ths.end + "<br>" + ths.venue + " (" + ths.type + ")";
@@ -1713,7 +1740,7 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 
 			// console.log(target_code_substr);
 
-			var umacinfo_text = '<br><a href="https://rateprof.tk/course/umac-mo/' + target_code_substr + '" target="_blank" class="umacinfo">前往暗黑資料庫查看評分</a>';
+	//		var umacinfo_text = '<br><a href="https://rateprof.tk/course/umac-mo/' + target_code_substr + '" target="_blank" class="umacinfo">前往暗黑資料庫查看評分</a>';
 
 			// if(window.jQuery){
 			// 	$.get(
@@ -1727,25 +1754,35 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 
 			// var umacinfo_text = '<br><a href="javascript:getRate(\'' + target_code_substr + '\',\'' + target_code_prof.split("(in")[0].cleanup() + '\')" class="umacinfo">查看教授評分</a>';
 
-			if(has_more_than_one_prof === false){
-				umacinfo_text = '<br><span class="umacinfo">這科唯一的教授 The only prof of this course</span>'
+	//		if(has_more_than_one_prof === false){
+	//			umacinfo_text = '<br><span class="umacinfo">這科唯一的教授 The only prof of this course</span>'
+	//		}
+
+			console.log(dates_groupby_str);
+
+			if(!document.getElementById(dates_groupby_str)) {
+				var tmpDiv = document.createElement('div');
+				tmpDiv.id = dates_groupby_str;
+				studyPlanDiv.appendChild(tmpDiv);
 			}
+
+			var tmpDiv = document.getElementById(dates_groupby_str);
 
 			if(conflict_arr.length === 0){
 
 				// console.log(dates);
 
 				stri += '<small>' + dates.join("<br>") + "</small>";
-				stri += '<span class="warning" style="background:#b8e4b8;color:#099848;">未與現有任何科目衝突 No Conflict</span>';
+				stri += '<br><span class="warning" style="background:#b8e4b8;color:#099848;">未與現有任何科目衝突 No Conflict</span>';
 
-				p.innerHTML = stri + umacinfo_text;
-				studyPlanDiv.appendChild(p);
+				p.innerHTML = stri; // + umacinfo_text;
+				tmpDiv.appendChild(p);
 			}
 			else{
 				stri = "<del>" + stri + "</del>";
 				stri += '<span class="warning">與 ' + conflict_arr.join(', ') + ' 衝突</span>';
-				p.innerHTML = stri + umacinfo_text;
-				studyPlanDiv.appendChild(p);
+				p.innerHTML = stri; // + umacinfo_text;
+				tmpDiv.appendChild(p);
 			}
 		}
 
