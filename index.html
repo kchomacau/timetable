@@ -65,14 +65,14 @@
 
 			<span class="line">
 				<label for="pr-start">
-					上堂時間/Begin
+					介乎/Between
 				</label>
 				<input type="text" id="pr-start" placeholder="e.g., 09:30" autocomplete="off" style="width:100px">
 			</span>
 
 			<span class="line">
 				<label for="pr-end">
-					落堂時間/End
+					與/and
 				</label>
 				<input type="text" id="pr-end" placeholder="e.g., 16:30" autocomplete="off" style="width:100px">
 			</span>
@@ -92,9 +92,9 @@
 	<h4>模擬課程表 Timetable Simulator</h4>
 	<ul class="inst">
 		<li class="announce" style="color:#000">
-			備註：課程表將儲存於您的瀏覽器緩存，若頁面異常，請放心刷新。
+			課程表儲存於您的瀏覽器內，若頁面異常，請放心刷新。
 			<br>
-			Note: Timetable will save in your browser. For any unexpected situation, refresh the page.
+			Timetable saves in your browser. Refresh the page if any unexpected situation occurred.
 		</li>
 		<li class="announce" style="color:#000">
 			更新於 2019年12月20日
@@ -157,7 +157,7 @@
 
 	<div id="courses-list">
 
-		<a href="javascript:localStorage.clear();javascript:window.location.reload()" class="btn-like">清除本地緩存 Clear Local Cache</a>
+		<a href="javascript:localStorage.clear();javascript:window.location.reload()" class="btn-like">清空課程表 Clear Timetable</a>
 
 		<h4 id="courseheader">課程 Courses</h4>
 
@@ -180,10 +180,10 @@
 				<br>
 				<a href="https://isw.umac.mo/siweb/">https://isw.umac.mo/siweb</a><br>
 				> 左方「Timetable」
-				> 全選*
+				> 全選
 				> 複製，並於下方貼上。
 				<br>
-				> "Timetable" > Select All* > Copy.
+				> "Timetable" > Select All > Copy.
 				Then paste it in the box below.
 			</p>
 			<p>&nbsp;</p>
@@ -193,11 +193,11 @@
 				<a href="https://isw.umac.mo/siweb/">https://isw.umac.mo/siweb</a><br>
 				> 左方「Study Plan」
 				> 右上切換至 Print 模式
-				> 全選*
+				> 全選
 				> 複製，並於下方貼上。
 				<br>
 				> "Study Plan" > Change to "Print" mode (at right-top corner)
-				> Select All* > Copy.
+				> Select All > Copy.
 				Then paste it in the box below.
 			</p>
 			<p>&nbsp;</p>
@@ -214,7 +214,7 @@
 			</p>
 			<p>&nbsp;</p>
 			<p style="font-size:12px; color:#a2a2a2;">
-				* How to Select All & Copy:
+				* How to Select All &amp; Copy:
 				<br>
 				(a) Computer: Click anywhere, press "Ctrl+A". Your target is to see the whole timetable or study plan selected. Then press "Ctrl+C".
 				<br>
@@ -223,8 +223,8 @@
 		</form>
 	</div>
 
-	<link href="style.css?revision=38" rel="stylesheet">
-	<script src="courses.js?revision=21"></script>
+	<link href="style.css?revision=39" rel="stylesheet">
+	<script src="courses.js?revision=22"></script>
 
 	<script>
 		var onServer = false;
@@ -235,7 +235,7 @@
 	integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
 	crossorigin="anonymous"></script> -->
 
-	<script src="script.js?revision=38"></script>
+	<script src="script.js?revision=39"></script>
 	<script>
 		// function checkAvailable(result){
 		// 	if(result==="not-available"){

@@ -112,6 +112,10 @@ var studyPlanDiv = document.getElementById("study-plan");
 var studyPlanLink = document.getElementById("studyplan-link");
 studyPlanLink.style.display = "none";
 
+var allSlotItems = [];
+var blackListSlot = [];
+var selectedCourseCount = 0;
+
 function getSelectedCourseCodeList(){
 	var arr = [];
 
@@ -559,7 +563,6 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 
 			li.innerHTML = '<h3><span style="background:' + used_colors_list[courses_list[i].code] + '"></span>' + courses_list[i].code + "</h3>" +
 							"<p>" + courses_list[i].name + "</p>" +
-							"<p><u>上課時間及地點 Time & Venue</u></p>" +
 							"<ul id='" + courses_list[i].code + "'></ul>" +
 							((courses_list[i].prof.replace(/\s/g, "")==="")
 								? ""
@@ -1643,7 +1646,13 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 	else{
 		// studyPlanDiv.innerHTML += '<p>&nbsp;</p>';
 
-		studyPlanDiv.innerHTML += '<p>共有 ' + (im_courses.length) + ' 節課</p>';
+		studyPlanDiv.innerHTML += '<p>共有 <span id="course-count">' + (im_courses.length) + '</span> 節課</p>' +
+			'<p>所有節數始於/Start at daily <span id="timeslots"></span></p>';
+
+		allSlotItems = [];
+		selectedCourseCount = 0;
+
+		var slots_collection = [];
 
 		var div = document.createElement("div");
 		// var less_arr = {};
@@ -1656,7 +1665,7 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 
 			var conflict_arr = [];
 			var dates = [];
-			var dates_groupby_str = 'cl-';
+			var dates_GBS_divId = 'cl-';
 
 		// 計上課
 			var key = im_courses[i].start;
@@ -1707,7 +1716,12 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 				continue;	// skip to next loop
 			}
 
-			dates_groupby_str += ths.day + ths.start + '-' + ths.end;
+			dates_GBS_divId += ths.day + ths.start + '-' + ths.end;
+
+			if(slots_collection.indexOf(ths.start) === -1) {
+				slots_collection.push(ths.start);
+				allSlotItems.push(ths.start);
+			}
 			dates.push(dayDisp[dayName.indexOf(ths.day)] + " - " + ths.start + "-" + ths.end + (ths.type==='Lecture' ? '' : " (" + ths.type + ")"));
 
 			// stri += "<br><small>";
@@ -1758,15 +1772,17 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 	//			umacinfo_text = '<br><span class="umacinfo">這科唯一的教授 The only prof of this course</span>'
 	//		}
 
-			console.log(dates_groupby_str);
+			// console.log(dates_GBS_divId);
 
-			if(!document.getElementById(dates_groupby_str)) {
+			dates_GBS_divId = dates_GBS_divId.replace(/:/g, '');
+
+			if(!document.getElementById(dates_GBS_divId)) {
 				var tmpDiv = document.createElement('div');
-				tmpDiv.id = dates_groupby_str;
+				tmpDiv.id = dates_GBS_divId;
 				studyPlanDiv.appendChild(tmpDiv);
 			}
 
-			var tmpDiv = document.getElementById(dates_groupby_str);
+			var tmpDiv = document.getElementById(dates_GBS_divId);
 
 			if(conflict_arr.length === 0){
 
@@ -1786,6 +1802,14 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 			}
 		}
 
+		slots_collection.sort();
+
+		for (var i=0; i<slots_collection.length; i++) {
+			var this_slot = slots_collection[i];
+			var slot_a = document.createElement('span');
+			slot_a.innerHTML = '<label for="r-'+i+'"><span><input type="checkbox" id="r-'+i+'" checked onchange="filterCourses(\''+this_slot+'\')">' + this_slot + '</span></label>';
+			document.getElementById("timeslots").appendChild(slot_a);
+		}
 
 	// 將object變成array
 		// var less_arr_fromObj = [];
@@ -1810,6 +1834,44 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 		// studyPlanDiv.innerHTML += '<p><span id="splist"></span></p>';
 		// document.getElementById("splist").innerHTML = str_l;
 	}
+}
+
+function filterCourses(changed_slot){
+	var allslots = document.querySelectorAll('#study-plan div');
+	var slotIndexOf = blackListSlot.indexOf(changed_slot);
+	selectedCourseCount = 0;
+
+	// mark the changed checkbox.
+	if(slotIndexOf >= 0){
+		blackListSlot.splice(slotIndexOf, 1);
+	}
+	else {
+		blackListSlot.push(changed_slot);
+	}
+
+	for (var i = 0; i < allslots.length; i++) {
+		var this_slot = allslots[i];
+		this_slot.style.display = 'block';
+
+		var bye = false;
+
+		for(var j=0; j<blackListSlot.length; j++){
+			if(this_slot.id.indexOf(blackListSlot[j].replace(':',''))%12===6) {
+				// this is the blacklisted one.
+
+				// console.log(this_slot);
+				this_slot.style.display = 'none';
+				bye = true;
+				break;
+			}
+		}
+
+		if(bye === false){
+			selectedCourseCount += (document.querySelectorAll('#' + this_slot.id + ' p').length);
+		}
+	}
+
+	document.getElementById('course-count').innerHTML = selectedCourseCount;
 }
 
 function find_period(disable_scroll){

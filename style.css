@@ -704,6 +704,11 @@ a.styled.hidden#undo {
 	padding:0;
 	margin-right:100px;
 }
+span#timeslots span span {
+	display: inline-block;
+	white-space: nowrap;
+	padding: 10px;
+}
 small.location {
 	color:#999;
 	font-size:12px;
