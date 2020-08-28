@@ -2,8 +2,6 @@ var colors = [
 "lightcoral","goldenrod","yellowgreen","darkkhaki","lightseagreen","limegreen","dodgerblue","slateblue","plum","mediumvioletred","sienna","burlywood","orangered","peru","seagreen","cornflowerblue","darkslategrey"
 ];
 
-var updated_at = "2020-8-28"
-
 var courses_info = [
 {code:"JAPN1000-001",name:"PRACTICAL JAPANESE I",prof:"KUMIKO KIMURA / MIHO ANDO (in Japanese)",type:"Lecture",day:"MON",start:"13:00",end:"14:15",remark:"Class for : - FAH - JAP17 / JAP19",venue:"E21-1045, E21-1043",host:"FAH-CJS"},
 {code:"JAPN1000-001",name:"PRACTICAL JAPANESE I",prof:"KUMIKO KIMURA / MIHO ANDO (in Japanese)",type:"Lecture",day:"TUE",start:"13:00",end:"14:15",remark:"Class for : - FAH - JAP17 / JAP19",venue:"E21-1045, E21-1043",host:"FAH-CJS"},
