@@ -1950,3 +1950,8 @@ if(localStorage["prSrchText"]){
 }
 
 genIt();
+
+var upd_sp = document.querySelectorAll(".upd-sp");
+for(var i=0; i<upd_sp.length; i++) {
+	upd_sp[i].innerHTML = updated_at;
+}
