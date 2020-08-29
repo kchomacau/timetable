@@ -5,6 +5,8 @@ var finding_period = false;
 var course_code_length = 8;
 var course_sec_length = 3;
 
+var default_block = {bg: "#d9d9d9", col: "#888888"}
+
 String.prototype.cleanup = function() {
    return this.toLowerCase().replace(/[^a-z]+/g, "");
 }
@@ -405,8 +407,8 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 				used_colors_list[courses_list[i].code] = colors[k];
 			}
 			if(background === undefined){
-				background = "#222222";
-				div.style.color = "#FFFFFF";
+				background = default_block.bg;
+				div.style.color = default_block.col;
 			}
 			div.style.borderColor = background;
 			div.style.lineHeight = tmpLineHeight + "px";
@@ -817,7 +819,7 @@ function filterIt(day, elCollectionIndex) {
 							var thisC = elCollection[day][elCollectionIndex];
 							var thatC = elCollection[day][j];
 
-							if(thatC.bottom >= thisC.top && thatC.top <= thisC.bottom && thatC.background === '#222222') {
+							if(thatC.bottom >= thisC.top && thatC.top <= thisC.bottom && thatC.background === default_block.bg) {
 								// overlap
 
 								if(this_cl_tmp.indexOf(thatC.code) === -1) {
@@ -1104,7 +1106,7 @@ function fetchIt(){
 				var coursename = courses_info[i].name.toLowerCase();
 
 				if(match_content_index >= 0){
-					coursename = coursename.replace(input_original.toLowerCase(), "<span>"+input_original+"</span>");
+					coursename = coursename.replace(input_original.toLowerCase(), "<span>"+input_original.toLowerCase()+"</span>");
 				}
 				if(match_prof_index >= 0){
 					coursename += "<br><font style='font-weight:normal;text-transform:none'>- Prof: " + courses_info[i].prof.toLowerCase().replace(input_original.toLowerCase(), "<span>"+input_original+"</span>") + '</span>';
@@ -1647,7 +1649,7 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 		// studyPlanDiv.innerHTML += '<p>&nbsp;</p>';
 
 		studyPlanDiv.innerHTML += '<p>共有 <span id="course-count">' + (im_courses.length) + '</span> 節課</p>' +
-			'<p>所有節數始於/Start at daily <span id="timeslots"></span></p>';
+			'<p>上堂時間/Classes start at <br><span id="timeslots"></span></p>';
 
 		allSlotItems = [];
 		selectedCourseCount = 0;
@@ -1718,7 +1720,9 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 
 			dates_GBS_divId += ths.day + ths.start + '-' + ths.end;
 
-			if(slots_collection.indexOf(ths.start) === -1) {
+			var should_show_checkbox = (ths.start === dates_GBS_divId.substr(6,5));
+
+			if(slots_collection.indexOf(ths.start) === -1 && should_show_checkbox === true) {
 				slots_collection.push(ths.start);
 				allSlotItems.push(ths.start);
 			}
