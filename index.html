@@ -10,19 +10,19 @@
 <body id="body">
 	<!-- <p><b>備註 / Note</b></p><ul class="inst"><li>部份 FST 課堂區分 Lab A 及 Lab B，在本表中將以 A 及 B 區分，唯實際情況下，該課時編號應為「001/LAB-LXX」。<br>Some courses for FST are divided two labs. "A" and "B" are used below, while the real situation should be "001/LAB-LXX".</li></ul><hr class="full"> -->
 
-	<h2>課程表模擬助手 Timetable Simulator</h2>
-	<p>by K. C. Ho</p>
-
-	<p>&nbsp;</p>
+	<header>
+		<h2>課程表模擬助手 Timetable Simulator</h2>
+		<p>by K. C. Ho</p>
+	</header>
 
 	<p style="color:dodgerblue;font-weight:bold;"><span class="max-only">向下滾到底</span><span class="min-only">在右邊窗格</span>，一鍵匯入 ISW Timetable &amp; Study Plan！</p>
 
 
-	<p>&nbsp;</p>
-	<form action="javascript:add()" id="table-top">
+	<p id="table-top">&nbsp;</p>
+	<form action="javascript:add()">
 		<p>
 			<label for="coursename">
-				課程編號、名稱 或 教授姓名 ／ Course Code or Title or Prof Name
+				<i class="fa fa-search" aria-hidden="true"></i> 課程或教授 Find a course or a prof.:
 			</label>
 			<span id="error"></span>
 			<div class="input-wrap">
@@ -31,18 +31,12 @@
 				<ul id="suggestion">
 				</ul>
 			</div>
-			<input type="submit" value="加入/檢視 Add/View">
+			<input type="submit" value="搜尋">
 		</p>
 	</form>
-
-	<p>或 以時間段搜尋<br>Or, by period.</p>
-
-	<style>
-		span.line {display: inline-block;}
-	</style>
-
 	<form action="javascript:find_period()">
 		<p>
+			/ 或 Or /<br>&nbsp;<br><i class="fa fa-clock-o" aria-hidden="true"></i> 時間段 Check a time slot:
 			<div class="input-wrap">
 				<select id="pr-day">
 					<option value="MON">星期一/Mon</option>
@@ -55,48 +49,36 @@
 
 			<span class="line">
 				<label for="pr-start">
-					介乎/Between
+					由<br>from
 				</label>
 				<input type="text" id="pr-start" placeholder="e.g., 09:30" autocomplete="off" style="width:100px">
 			</span>
 
 			<span class="line">
 				<label for="pr-end">
-					與/and
+					至<br>to
 				</label>
 				<input type="text" id="pr-end" placeholder="e.g., 16:30" autocomplete="off" style="width:100px">
 			</span>
 
 			<span class="line">
 				<label for="pr-ven">
-					課室/Venue (Optional)
+					於<br>at
 				</label>
 				<input type="text" id="pr-ven" placeholder="e.g., E6-G111" autocomplete="off" style="width:100px">
 			</span>
 			
 			</div>
-			<input type="submit" value="搜尋 Search">
+			<input type="submit" value="搜尋">
 		</p>
 	</form>
 
-	<h4>模擬課程表 Timetable Simulator</h4>
-	<ul class="inst">
-		<li class="announce" style="color:#000">
-			課程表儲存於您的瀏覽器內，若頁面異常，請放心刷新。
-			<br>
-			Timetable saves in your browser. Refresh the page if any unexpected situation occurred.
-		</li>
-		<li class="announce" style="color:#000">
-			更新於 <span class="upd-sp">--</span>
-			<br>
-			Updated on <span class="upd-sp">--</span>
-		</li>
-		<li class="announce">
-			重要聲明：下面列出的課程資訊可能已經過時，本工具之作者將不會對因閣下使用下述資料而產生的一切結果負任何責任，若要查閱最新資訊請參閱 <a href="http://isw.umac.mo/siweb">http://isw.umac.mo/siweb</a> !
-			<br>
-			Information listed below may be outdated. No responsibility will be taken by the developer. For latest info, pls refer to <a href="http://isw.umac.mo/siweb">http://isw.umac.mo/siweb</a>.
-		</li>
-	</ul>
+	<p>&nbsp;</p>
+	<h4>使用說明 Tips</h4>
+	<p>課程表儲存於您的瀏覽器內，若頁面異常，請放心刷新。本工具所載資料最後更新於<span class="upd-sp">--</span>，代表所列出的課程資訊可能已經過時，本工具之作者將不會對因閣下使用下述資料而產生的一切結果負任何責任，若要查閱最新資訊，請參閱 <a href="http://isw.umac.mo/siweb" class="dodg">http://isw.umac.mo/siweb</a>。</p>
+	<p>Timetable saves in your browser. Refresh the page if any unexpected situation occurred. Last updated on <span class="upd-sp">--</span>, which means the information listed may be outdated. No responsibility will be taken by the developer. For latest info, pls refer to <a href="http://isw.umac.mo/siweb" class="dodg">http://isw.umac.mo/siweb</a>.</p>
+	<p>&nbsp;</p>
+
 	<a href="javascript:lockToggle()" id="lock">
 		<span id="lock-on">檢視模式<br><small>View Mode</small></span><span id="lock-off">修改模式<br><small>Edit Mode</small></span>
 	</a>
@@ -162,54 +144,16 @@
 
 		<form action="javascript:addIsw()" id="isw-form">
 			<p>
-				<b>匯入模擬課程表 Import Timetable</b>
-				<br>&nbsp;
-			</p>
-			<p>
-				<strong>匯入課程表</strong>
-				<br>
-				<a href="https://isw.umac.mo/siweb/">https://isw.umac.mo/siweb</a><br>
-				> 左方「Timetable」
-				> 全選
-				> 複製，並於下方貼上。
-				<br>
-				> "Timetable" > Select All > Copy.
-				Then paste it in the box below.
+				<b>匯入 Import</b>
 			</p>
 			<p>&nbsp;</p>
-			<p>
-				<strong>匯入Study Plan</strong>
-				<br>
-				<a href="https://isw.umac.mo/siweb/">https://isw.umac.mo/siweb</a><br>
-				> 左方「Study Plan」
-				> 右上切換至 Print 模式
-				> 全選
-				> 複製，並於下方貼上。
-				<br>
-				> "Study Plan" > Change to "Print" mode (at right-top corner)
-				> Select All > Copy.
-				Then paste it in the box below.
-			</p>
+			<p><strong>課程表 Timetable</strong><br>在<a href="https://isw.umac.mo/siweb/">https://isw.umac.mo/siweb</a>複製整個Timetable，並在此貼上。 / Copy your timetable from <a href="https://isw.umac.mo/siweb/">https://isw.umac.mo/siweb</a> and paste here.</p>
+			<p>&nbsp;</p>
+			<p><strong>Study Plan</strong><br>在<a href="https://isw.umac.mo/siweb/">https://isw.umac.mo/siweb</a>打開你的Study Plan，右上角選擇「Print」模式，複製所有文字並在此貼上。 / Open your study plan on <a href="https://isw.umac.mo/siweb/">https://isw.umac.mo/siweb</a>, switch to "Print" mode, copy all the things and paste here.</p>
 			<p>&nbsp;</p>
 			<textarea id="isw"></textarea>
 			<input type="submit" value="匯入 Import">
 			<a href="javascript:loadPrevIsw()" class="button-like">查看上次內容</a>
-			<p>&nbsp;</p>
-			<p style="font-size:12px; color:#a2a2a2;">
-				* 全選->複製 操作教學：
-				<br>
-				(a) 電腦用戶點選任意地方，按「Ctrl+A」，目標是看見選取了整個 Timetable 或 Study Plan，再按「Ctrl+C」。
-				<br>
-				(b) 手機用戶點選任意一個字，長按，會彈出提示，選「全選」(iOS) /「選擇全部」(Android)，再按「複製」。
-			</p>
-			<p>&nbsp;</p>
-			<p style="font-size:12px; color:#a2a2a2;">
-				* How to Select All &amp; Copy:
-				<br>
-				(a) Computer: Click anywhere, press "Ctrl+A". Your target is to see the whole timetable or study plan selected. Then press "Ctrl+C".
-				<br>
-				(b) Mobile: Long press any words, pick "Select All", and click "Copy".
-			</p>
 		</form>
 	</div>
 
@@ -220,8 +164,8 @@
 			upd_sp[i].innerHTML = "2021-1-13";
 		}
 	</script>
-	<link href="style.css?revision=41" rel="stylesheet">
-	<script src="courses.js?revision=41"></script>
+	<link href="style.css?revision=44" rel="stylesheet">
+	<script src="courses.js?revision=44"></script>
 
 	<script>
 		var onServer = false;
@@ -232,7 +176,8 @@
 	integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
 	crossorigin="anonymous"></script> -->
 
-	<script src="script.js?revision=43"></script>
+	<script src="script.js?revision=44"></script>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-111365608-1"></script>

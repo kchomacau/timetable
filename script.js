@@ -79,13 +79,13 @@ var totalHeight = 600;
 var lineHeight = 12;
 var dayName = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
 var dayDisp = [
-	"Sun(日)",
-	"Mon(一)",
-	"Tue(二)",
-	"Wed(三)",
-	"Thu(四)",
-	"Fri(五)",
-	"Sat(六)"
+	"日(Sun)",
+	"一(Mon)",
+	"二(Tue)",
+	"三(Wed)",
+	"四(Thu)",
+	"五(Fri)",
+	"六(Sat)"
 ];
 var errorDiv = document.getElementById("error");
 var courseListDiv = document.getElementById("courselist");
@@ -609,7 +609,7 @@ if(!document.getElementById(ths_id)){
 	var li_el = document.createElement("li");
 	li_el.id = ths_id;
 
-	li_el.innerHTML += "<b>" + dayDisp[dayIndex] + " " + ths.start + "-" + ths.end + "</b><br>" + ths.venue + (ths.type==='Lecture' ? '' : " (" + ths.type + ")");
+	li_el.innerHTML += "<b>" + dayDisp[dayIndex] + " " + ths.start + "-" + ths.end + "</b><br>"+ ths.venue + (ths.type==='Lecture' ? '' : "(" + ths.type + ")");
 
 	// console.log(ths.code);
 
@@ -1648,8 +1648,8 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 	else{
 		// studyPlanDiv.innerHTML += '<p>&nbsp;</p>';
 
-		studyPlanDiv.innerHTML += '<p>共有 <span id="course-count">' + (im_courses.length) + '</span> 節課</p>' +
-			'<p>上堂時間/Classes start at <br><span id="timeslots"></span></p>';
+		studyPlanDiv.innerHTML += '<p>共有 <span id="course-count">' + (im_courses.length) + '</span> 節課</p>';// +
+			// '<p>上堂時間/Classes start at <br><span id="timeslots"></span></p>';
 
 		allSlotItems = [];
 		selectedCourseCount = 0;
@@ -1806,14 +1806,14 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 			}
 		}
 
-		slots_collection.sort();
-
-		for (var i=0; i<slots_collection.length; i++) {
-			var this_slot = slots_collection[i];
-			var slot_a = document.createElement('span');
-			slot_a.innerHTML = '<label for="r-'+i+'"><span><input type="checkbox" id="r-'+i+'" checked onchange="filterCourses(\''+this_slot+'\')">' + this_slot + '</span></label>';
-			document.getElementById("timeslots").appendChild(slot_a);
-		}
+		// 上課時間概要列表
+		// slots_collection.sort();
+		// for (var i=0; i<slots_collection.length; i++) {
+		// 	var this_slot = slots_collection[i];
+		// 	var slot_a = document.createElement('span');
+		// 	slot_a.innerHTML = '<label for="r-'+i+'"><span><input type="checkbox" id="r-'+i+'" checked onchange="filterCourses(\''+this_slot+'\')">' + this_slot + '</span></label>';
+		// 	document.getElementById("timeslots").appendChild(slot_a);
+		// }
 
 	// 將object變成array
 		// var less_arr_fromObj = [];

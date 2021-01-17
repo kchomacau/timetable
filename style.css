@@ -1,10 +1,22 @@
 body, input, select {
-	font-family: Tahoma, Geneva, sans-serif;
+	font-family: Arial, sans-serif;
 	font-size: 13px;
+	color: #1a1a1a;
+}
+div.col.day-col,
+ul#courselist > li li,
+#study-plan p small {
+	font-family: "Courier New", monospace;
 }
 body, h1, h2, h3, h4, h5, h6, p {
 	padding:0;
 	margin:0;
+}
+body {
+	background: #fafafa;
+}
+header h2, header p {
+	display: inline;
 }
 ul {
 	margin-top:0;
@@ -47,8 +59,24 @@ body {
 	padding:20px;
 }
 form {
-	padding:5px 0 25px 0;
+	/*padding:5px 0 25px 0;*/
 }
+::placeholder {
+	color: #ccc;
+	font-size: 13px;
+}
+.upd-sp {
+	background: dodgerblue;
+	padding: 1px 4px;
+	-webkit-border-radius:3px;
+	border-radius: 3px;
+	color: #fff;
+}
+
+
+span.line, span.line label {display: inline-block; vertical-align: middle;}
+span.line label {line-height: 13px;}
+
 div#wrapper {
 	width:888px;
 	overflow: hidden;
@@ -90,8 +118,8 @@ div.col a, div.col div {
 	position: absolute;
 	left:0;
 	right:0;
-	border:1px solid #000;
-	color:#000;
+	border:1px solid #1a1a1a;
+	color:#1a1a1a;
 	text-align: center;
 	font-size:12px;
 	overflow:hidden;
@@ -177,7 +205,7 @@ div.col a:hover span.alt-text {
 }
 div.col.timestamps {
 	color:#ccc;
-	border-color:#fff;
+	border:0;
 	width:40px;
 }
 div.col.timestamps div {
@@ -197,6 +225,7 @@ textarea {
 	-webkit-border-radius:3px;
 	border-radius:3px;
 	outline:0;
+	background: #fff;
 }
 textarea {
 	overflow: hidden;
@@ -208,6 +237,10 @@ textarea:hover  {
 input[type="text"]:focus,
 textarea:focus  {
 	border-color:#0089ff;
+}
+#isw-form {
+	margin-top: -10px;
+	padding-top: 10px;
 }
 #isw-form textarea {
 	width:100%;
@@ -335,7 +368,7 @@ a#lock.lock #lock-on {
 }
 a#lock.lock #lock-off,
 a#lock.unlock #lock-on {
-	color:#000;
+	color:#1a1a1a;
 }
 a#lock.lock #lock-off {
 	left:-10px;
@@ -374,7 +407,7 @@ li p, li li {
 hr {
 	border:0;
 	background:transparent;
-	border-top:1px dotted #000;
+	border-top:1px dotted #1a1a1a;
 	padding:0;
 	margin:3px;
 	display: block;
@@ -383,14 +416,17 @@ hr.full {
 	margin:25px -5px;
 	border-top:1px solid #ccc;
 }
-li.announce {
+a.dodg {
+	color:dodgerblue;
+}
+/*li.announce {
 	padding:5px 0;
 	color:#ff6a00;
 	font-size: 14px;
 }
 li.announce a {
 	color:#ff6a00;
-}
+}*/
 .input-wrap {
 	position: relative;
 	display: inline-block;
@@ -460,11 +496,13 @@ a.pclear {
 p.br {
 	padding:20px;
 	position: fixed;
-	right: 0;
-	top:0;
-	background: #222;
+	right: 5px;
+	top:5px;
+	background: #36ccdf;
 	color:#fff;
 	z-index:120;
+	-webkit-border-radius:3px;
+	border-radius: 3px;
 }
 @media screen and (min-width:1276px){
 	div#courses-list {
@@ -479,7 +517,8 @@ p.br {
 		overflow-y: scroll;
 	}
 	div#courses-list h4 {
-		padding-top: 20px;
+		margin-top: 10px;
+		padding-top: 10px;
 	}
 	body {
 		margin-right: 28%;
@@ -489,6 +528,7 @@ p.br {
 	}
 	p.br {
 		right:28%;
+		top: 0;
 		margin:10px;
 		/* top:58px; */
 	}
@@ -501,7 +541,8 @@ p.br {
 		display: none;
 	}
 	div#courses-list h4 {
-		padding-top: 18px;
+		margin-top: 8px;
+		padding-top: 10px;
 	}
 	.min-only {
 		display: none !important;
@@ -760,7 +801,7 @@ a.umacinfo:after {
 
 
 @media screen and (max-width:799px){
-	body {padding-top: 80px;}
+	body {padding-top: 60px;}
 }
 
 p.br { padding: 5px 10px; }
