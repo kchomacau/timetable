@@ -114,6 +114,8 @@ var studyPlanDiv = document.getElementById("study-plan");
 var studyPlanLink = document.getElementById("studyplan-link");
 studyPlanLink.style.display = "none";
 
+var studyPlanHeader = "<b><i class=\"fa fa-list-alt\" aria-hidden=\"true\"></i> 可選擇的課程列表 Available Courses List</b>";
+
 var allSlotItems = [];
 var blackListSlot = [];
 var selectedCourseCount = 0;
@@ -1377,7 +1379,7 @@ function addIsw(){
 		finding_period = false;
 
 		studyPlanLink.style.display = "inline-block";
-		studyPlanDiv.innerHTML = "<hr class='full'><p><b>可選擇的課程列表 Available Courses List</b></p><p>&nbsp;</p>";
+		studyPlanDiv.innerHTML = "<hr class='full'><p>"+studyPlanHeader+"</p><p>&nbsp;</p>";
 
 		// console.log("im_courses", im_courses);
 
@@ -1582,7 +1584,7 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 	finding_period = true;
 
 	studyPlanLink.style.display = "inline-block";
-	studyPlanDiv.innerHTML = "<hr class='full'><p><b>可選擇的課程列表 Available Courses List</b><br><small>區間 Range: " + range + "</small></p>";
+	studyPlanDiv.innerHTML = "<hr class='full'><p>"+studyPlanHeader+"<br><small>區間 Range: " + range + "</small></p>";
 
 
 	if(disable_scroll && disable_scroll===true){

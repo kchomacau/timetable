@@ -120,18 +120,18 @@
 	<a href="javascript:ctrlY()" class="styled hidden" id="redo">Redo 重做</a>
 
 	<p class="br">
-		Jump:
-		<a href="#table-top" class="max-only"><img src="clock_w.png" alt="Timetable"></a>
-		<a href="#courseheader"><img src="list_w.png" alt="Detail"></a>
-		<a href="#study-plan" id="studyplan-link"><img src="checked_w.png" alt="Available Courses List"></a>
-		<a href="#isw-form"><img src="upload_w.png" alt="Import"></a>
+		Tool:
+		<a href="#table-top" class="max-only"><i class="fa fa-calendar" title="Timetable"></i></a><!--
+		--><a href="#courseheader"><i class="fa fa-shopping-basket" title="Courses"></i></a><!--
+		--><a href="#study-plan" id="studyplan-link"><i class="fa fa-list-alt" title="Available Courses"></i></a><!--
+		--><a href="#isw-form"><i class="fa fa-plus-circle" title="Import"></i></a>
 	</p>
 
 	<div id="courses-list">
 
 		<a href="javascript:localStorage.clear();javascript:window.location.reload()" class="btn-like">清空課程表 Clear Timetable</a>
 
-		<h4 id="courseheader">課程 Courses</h4>
+		<h4 id="courseheader"><i class="fa fa-shopping-basket" aria-hidden="true"></i> 課程 Courses</h4>
 
 		<div id="umacinfo"></div>
 
@@ -144,7 +144,7 @@
 
 		<form action="javascript:addIsw()" id="isw-form">
 			<p>
-				<b>匯入 Import</b>
+				<b><i class="fa fa-plus-circle" aria-hidden="true"></i> 匯入 Import</b>
 			</p>
 			<p>&nbsp;</p>
 			<p><strong>課程表 Timetable</strong><br>在<a href="https://isw.umac.mo/siweb/">https://isw.umac.mo/siweb</a>複製整個Timetable，並在此貼上。 / Copy your timetable from <a href="https://isw.umac.mo/siweb/">https://isw.umac.mo/siweb</a> and paste here.</p>
@@ -164,7 +164,7 @@
 			upd_sp[i].innerHTML = "2021-1-13";
 		}
 	</script>
-	<link href="style.css?revision=45" rel="stylesheet">
+	<link href="style.css?revision=46" rel="stylesheet">
 	<script src="courses.js?revision=44"></script>
 
 	<script>
@@ -176,7 +176,7 @@
 	integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
 	crossorigin="anonymous"></script> -->
 
-	<script src="script.js?revision=44"></script>
+	<script src="script.js?revision=46"></script>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <!-- Global site tag (gtag.js) - Google Analytics -->

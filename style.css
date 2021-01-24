@@ -697,13 +697,15 @@ ul#courselist > li > h3 + p {
 #study-plan p {
 	padding-bottom: 8px;
 }
-#study-plan a, p.br a {
+#study-plan a /*, p.br a*/ {
 	color:dodgerblue;
 	text-decoration: none;
 }
 p.br a {
-	padding:5px 10px;
+	/*padding:5px 10px;*/
 	display: block;
+	color: #fff;
+	text-decoration: none;
 }
 a#scroll-lock {
 	z-index:120;
@@ -793,13 +795,15 @@ a.umacinfo:after {
 	padding-left: 2px;
 }
 
+p.br { padding: 5px 10px; text-align: center; font-size: 12px;}
+p.br a {padding: 5px; font-size: 17px;}
 
 @media screen and (max-width:1275px){	
 	p.br {
 		padding: 0 15px;
 	}
 	p.br a {
-		padding: 13px 7px;
+		padding: 13px 10px;
 		display: inline-block;
 	}
 	a#lock {
@@ -813,6 +817,5 @@ a.umacinfo:after {
 	body {padding-top: 60px;}
 }
 
-p.br { padding: 5px 10px; }
-p.br a { padding: 0; }
-p.br a img { height: 23px; padding: 5px 15px; vertical-align: middle; }
+/*p.br a { padding: 0; }*/
+/*p.br a img { height: 23px; padding: 5px 15px; vertical-align: middle; }*/
