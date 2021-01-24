@@ -1566,7 +1566,7 @@ function checkProfBtn(btn, params) {
 
 	var profBtnFail = function(btn) {
 		var btnId = "#prof-" + btn;
-		$('<br><span class="umacinfo"><i class="fa fa-info-circle" aria-hidden="true"></i> 未有此教授的資料 Professor info not found</span>').insertAfter(btnId);
+		$('<br><span class="umacinfo"><i class="fa fa-user-times" aria-hidden="true"></i> 未有此教授的資料 Professor info not found</span>').insertAfter(btnId);
 		$(btnId).hide();
 	};
 	var profBtnSuccess = function(btn, text) {
