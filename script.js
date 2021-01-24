@@ -114,6 +114,9 @@ var studyPlanDiv = document.getElementById("study-plan");
 var studyPlanLink = document.getElementById("studyplan-link");
 studyPlanLink.style.display = "none";
 
+var profBtn = 0;
+
+var searched_umacinfo = {};
 var studyPlanHeader = "<b><i class=\"fa fa-list-alt\" aria-hidden=\"true\"></i> 可選擇的課程列表 Available Courses List</b>";
 
 var allSlotItems = [];
@@ -162,6 +165,20 @@ function lockToggle(){
 }
 function convertToStamp(t){
 	return (parseInt(t.substr(0,2)) * 60) + (parseInt(t.substr(3,2)) * 1);
+}
+function convertToDisp(t){
+	if(t == '') {
+		return t;
+	}
+	var time = convertToStamp(t);
+
+	var hour = parseInt(time/60);
+	var min = parseInt(time % 60);
+
+	if(min < 10) {
+		min = '0' + min
+	}
+	return hour + ":" + min;
 }
 function addToScreen(target, el, i){
 	window.setTimeout(function(){
@@ -1544,7 +1561,60 @@ var totalSort = {};
 // }
 
 
+// For umeh.top
+function checkProfBtn(btn, params) {
 
+	var profBtnFail = function(btn) {
+		var btnId = "#prof-" + btn;
+		$('<br><span class="umacinfo"><i class="fa fa-info-circle" aria-hidden="true"></i> 未有此教授的資料 Professor info not found</span>').insertAfter(btnId);
+		$(btnId).hide();
+	};
+	var profBtnSuccess = function(btn, text) {
+		var btnId = "#prof-" + btn;
+		$(btnId).append(text);
+	};
+
+	if(params in searched_umacinfo) {
+		if(searched_umacinfo[params].error === true) {
+			return profBtnFail(btn);
+		}
+		else{
+			return profBtnSuccess(btn, searched_umacinfo[params].text);
+		}
+	}
+
+	if(window.jQuery){
+		$.getJSON(
+			"https://mpserver.umeh.top/all_comment_info/" + params,
+			{}
+		).done(function(data){
+			var marks = data.prof_info.result;
+			var star_levels = ["star-o", "star-half-o", "star"];
+			var star_enum = 2;
+
+			if(marks <= 4) {
+				star_enum = 1;
+			}
+			if(marks <= 1) {
+				star_enum = 0;
+			}
+
+			var text = ' (<i class="fa fa-' + star_levels[star_enum] + '" aria-hidden="true"></i>' + marks.toFixed(1) + '/5)';
+			profBtnSuccess(btn, text);
+
+			searched_umacinfo[params] = {
+				error: false,
+				text: text
+			}
+		}).fail(function(){
+			profBtnFail(btn);
+
+			searched_umacinfo[params] = {
+				error: true
+			}
+		});
+	}
+}
 
 function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 
@@ -1571,7 +1641,7 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 		return print_error("時間格式錯誤 / Time format invalid.");
 	}
 
-	var range = day + " " + starttext + "-" + endtext;
+	var range = day + " " + convertToDisp(starttext) + "-" + convertToDisp(endtext);
 
 	// if(window.jQuery && onServer===true){
 	// 	$.post(
@@ -1760,7 +1830,14 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 
 			// console.log(target_code_substr);
 
-	//		var umacinfo_text = '<br><a href="https://rateprof.tk/course/umac-mo/' + target_code_substr + '" target="_blank" class="umacinfo">前往暗黑資料庫查看評分</a>';
+			// var umacinfo_text = '<br><a href="https://rateprof.tk/course/umac-mo/' + target_code_substr + '" target="_blank" class="umacinfo">前往暗黑資料庫查看評分</a>';
+			var namecard = target_code_prof.split(" ")[0];
+			namecard = namecard[0].toUpperCase() + namecard.substr(1).toLowerCase();
+
+			var umacinfo_params = '?New_code=' + target_code_substr + '&prof_name=' + encodeURIComponent(target_code_prof);
+			profBtn++;
+
+			var umacinfo_text = '<a href="https://www.umeh.top/instructor.html' + umacinfo_params + '" target="_blank" class="umacinfo" id="prof-' + profBtn + '"><i class="fa fa-address-card-o" aria-hidden="true"></i> ' + namecard + '</a>';
 
 			// if(window.jQuery){
 			// 	$.get(
@@ -1774,9 +1851,9 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 
 			// var umacinfo_text = '<br><a href="javascript:getRate(\'' + target_code_substr + '\',\'' + target_code_prof.split("(in")[0].cleanup() + '\')" class="umacinfo">查看教授評分</a>';
 
-	//		if(has_more_than_one_prof === false){
-	//			umacinfo_text = '<br><span class="umacinfo">這科唯一的教授 The only prof of this course</span>'
-	//		}
+			if(has_more_than_one_prof === false){
+				umacinfo_text = '<br><span class="umacinfo"><i class="fa fa-info-circle" aria-hidden="true"></i> 這科唯一的教授 The only prof of this course</span>'
+			}
 
 			// console.log(dates_GBS_divId);
 
@@ -1797,14 +1874,18 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 				stri += '<small>' + dates.join("<br>") + "</small>";
 				stri += '<br><span class="warning" style="background:#b8e4b8;color:#099848;">未與現有任何科目衝突 No Conflict</span>';
 
-				p.innerHTML = stri; // + umacinfo_text;
+				p.innerHTML = stri + umacinfo_text;
 				tmpDiv.appendChild(p);
 			}
 			else{
 				stri = "<del>" + stri + "</del>";
 				stri += '<span class="warning">與 ' + conflict_arr.join(', ') + ' 衝突</span>';
-				p.innerHTML = stri; // + umacinfo_text;
+				p.innerHTML = stri + umacinfo_text;
 				tmpDiv.appendChild(p);
+			}
+
+			if(has_more_than_one_prof === true) {
+				checkProfBtn(profBtn, umacinfo_params);
 			}
 		}
 
