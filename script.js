@@ -11,8 +11,49 @@ var default_block = {bg: "#d9d9d9", col: "#888888"}
 //    return this.toLowerCase().replace(/[^a-z]+/g, "");
 // }
 
+function checkTextOverflow(){
+	var spans = document.querySelectorAll(".day-col a span.text-marq");
+	var margin_px = 5;
+	var col_width = 118;
+	var px_per_frame = 1;
+
+	for(var span of spans) {
+		// if(span.innerHTML.length > 19) {
+			// should run
+
+			var left = margin_px;
+
+			if(span.style.left) {
+				left = (parseInt(span.style.left) - px_per_frame);
+			}
+
+			if(left < (col_width - margin_px - span.offsetWidth)) {
+				left = margin_px;
+			}
+
+			span.style.left = left + 'px';
+			// span.style.marginLeft = left < margin_px ? 0 : ((margin_px - left) + 'px');
+			span.style.visibility = (left === margin_px) ? 'hidden' : '';
+		// }
+	}
+}
+
 function isLab(obj) {
-	return obj.type ==="Lab";
+	if (obj.type ==="Lab") {
+
+		var countLab = 0;
+
+		for(var i=0; i<courses.length; i++) {
+			if(courses[i].code === obj.code && courses[i].type === "Lab") {
+				countLab++;
+			}
+		}
+
+		return (countLab > 1);
+	}
+	else {
+		return false;
+	}
 }
 
 function match_course(content, with_section){
@@ -382,7 +423,7 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 		var weekday = dayName.indexOf(courses_list[i].day);
 		if(weekday > -1){
 			if(allCourseMode === true){
-				var basicHTML = "<small>" + courses_list[i].code + "<br><small>" + courses_list[i].start + "-" + courses_list[i].end + " @ " + courses_list[i].venue + "</small></small>";
+				var basicHTML = courses_list[i].code + "<br>" + courses_list[i].start + "-" + courses_list[i].end + "<br>" + courses_list[i].venue;
 				// var prevFound = false;
 				// for(var k=0; k<i; k++){
 				// 	if(
@@ -406,7 +447,12 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 			var div = document.createElement("a");
 			var this_id = courses_list[i].code + "-" +courses_list[i].start + "-" +courses_list[i].end + "-" +courses_list[i].day;
 			if(allCourseMode === false){
-				div.href = "javascript:deleteIt('" + courses_list[i].code + "')";
+				if (isLab(courses_list[i])) {
+					div.href = "javascript:removeSection(" + i + ")";
+				}
+				else {
+					div.href = "javascript:deleteIt('" + courses_list[i].code + "')";
+				}
 			}
 			else{
 				div.href = "javascript:filterIt(" + weekday + "," + elCollection[weekday].length + ")";
@@ -416,14 +462,14 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 			div.style.height = parseInt(divHeight) + "px";
 			var paddingTop = (divHeight - (tmpLineHeight*4)) / 2;
 			if(allCourseMode === false){
-				var basicHTML = courses_list[i].code + "<br><small><small>" + courses_list[i].name + "</small></small><br><small>" + courses_list[i].venue + "<br>" + courses_list[i].start + "-" + courses_list[i].end + "</small>";
+				var basicHTML = courses_list[i].code + "<br><span" + (courses_list[i].name.length > 19 ? " class=\"text-marq\"" : "") + ">" + courses_list[i].name + "</span><br>" + courses_list[i].venue + "<br>" + courses_list[i].start + "-" + courses_list[i].end;
 				if(paddingTop > 0){
 				 	div.innerHTML = basicHTML;
 				}
 				else{
 					tmpLineHeight = 8;
 					var paddingTop = (divHeight - (tmpLineHeight*3)) / 2;
-					div.innerHTML = "<small>" + courses_list[i].code + "<br><small>" + courses_list[i].name + "</small><br>" + courses_list[i].start + "-" + courses_list[i].end + ", " + courses_list[i].venue + "</small>";
+					div.innerHTML = courses_list[i].code + "<br>" + courses_list[i].start + "-" + courses_list[i].end + "<br>" + courses_list[i].venue;
 				}
 			}
 			else{
@@ -466,7 +512,7 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 				div.appendChild(span);
 				var span = document.createElement("span");
 				span.className = "alt-text";
-				span.innerHTML = courses_list[i].code;
+				span.innerHTML = isLab(courses_list[i]) ? "(Lab)" : courses_list[i].code;
 				span.style.height = tmpLineHeight + "px";
 				div.appendChild(span);
 			}
@@ -1120,6 +1166,8 @@ function removeSection(i){
 	// if all labs are removed
 	if(totalRemovedLab === totalLab) {
 		// add back all the lab.
+
+		alert(this_courseCode + ": 你不可以移除全部Lab。");
 
 		for(var j=0; j<courses.length; j++){
 			if(courses[j].code === this_courseCode && isLab(courses[j])){
@@ -2135,3 +2183,5 @@ if(localStorage["prSrchText"]){
 }
 
 genIt();
+window.setInterval(checkTextOverflow, 83);
+

@@ -16,7 +16,7 @@ body {
 	background: #fafafa;
 }
 header h2, header p {
-	display: inline;
+	display: inline-block;
 }
 ul {
 	margin-top:0;
@@ -132,7 +132,11 @@ div.col a, div.col div {
 .selected-course div.col a,
 div.col.other-col a small {
 	white-space: nowrap;
-	text-overflow: ellipsis;
+	/*text-overflow: ellipsis;*/
+	letter-spacing: -1px;
+}
+div.col a span.text-marq {
+	position: relative;
 }
 div.col.other-col a small {
 	opacity: 0.3;
@@ -286,7 +290,7 @@ input[type="submit"] {
 	padding: 10px 0 3px 0;
 	display: block;
 }
-a#lock, a#scroll-lock {
+/*a#lock, a#scroll-lock {
 	display: block;
 	text-align: center;
 	height:48px;
@@ -300,10 +304,10 @@ a#lock, a#scroll-lock {
 	background: #f1f1f1;
 	width:140px;
 	position: relative;
-}
+}*/
 /*a#scroll-lock {*/
 
-a#scroll-lock {display: none;}
+a#scroll-lock, a#lock {display: none;}
 
 /* a#lock {
 	position: fixed;
@@ -316,7 +320,7 @@ a#scroll-lock {display: none;}
 	z-index:99;
 } */
 
-a#lock {display: none;}
+/*a#lock {display: none;}
 
 a#scroll-lock .textunlock,
 .lockScreen a#scroll-lock .textlock {
@@ -378,7 +382,7 @@ a#lock.lock #lock-off {
 }
 a#lock.unlock #lock-on {
 	right:-10px;
-}
+}*/
 li p {
 	padding-top:8px;
 }
@@ -526,9 +530,9 @@ p.br {
 	body {
 		margin-right: 28%;
 	}
-	body.lockScreen {
+	/*body.lockScreen {
 		overflow: hidden;
-	}
+	}*/
 	p.br {
 		right:28%;
 		top: 0;
@@ -540,9 +544,9 @@ p.br {
 	}
 }
 @media screen and (max-width:1275px){
-	a#scroll-lock {
+	/*a#scroll-lock {
 		display: none;
-	}
+	}*/
 	div#courses-list h4 {
 		margin-top: 8px;
 		padding-top: 10px;
@@ -596,6 +600,10 @@ a.btn-like:hover {
 }
 #courses-list li a.course-hide:hover {
 	color: #4b4b4b !important;
+}
+#courses-list li a.course-hide:hover + b {
+	text-decoration: line-through;
+	color: #6a6a6a;
 }
 #courses-list li a.add,
 #courses-list li a.del {
@@ -734,9 +742,9 @@ p.br a {
 	color: #fff;
 	text-decoration: none;
 }
-a#scroll-lock {
+/*a#scroll-lock {
 	z-index:120;
-}
+}*/
 a.styled {
 	padding: 8px 13px;
 	/*background: #222;*/
@@ -832,10 +840,10 @@ p.br a {padding: 5px; font-size: 17px;}
 		padding: 13px 10px;
 		display: inline-block;
 	}
-	a#lock {
+	/*a#lock {
 		position: relative;
 		right: auto;
-	}
+	}*/
 }
 
 
