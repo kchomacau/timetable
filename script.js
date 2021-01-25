@@ -7,8 +7,12 @@ var course_sec_length = 3;
 
 var default_block = {bg: "#d9d9d9", col: "#888888"}
 
-String.prototype.cleanup = function() {
-   return this.toLowerCase().replace(/[^a-z]+/g, "");
+// String.prototype.cleanup = function() {
+//    return this.toLowerCase().replace(/[^a-z]+/g, "");
+// }
+
+function isLab(obj) {
+	return obj.type ==="Lab";
 }
 
 function match_course(content, with_section){
@@ -48,23 +52,46 @@ if(localStorage["coursesJson"]){
 
 	for(var i=0; i<tmp_courses.length; i++){
 
-		if(looked_courses.indexOf(tmp_courses[i].code)>-1){
+		var this_courseCode = tmp_courses[i].code;
+
+		if(looked_courses.indexOf(this_courseCode)>-1){
 			continue;
 		}
 
-		looked_courses.push(tmp_courses[i].code);
+		looked_courses.push(this_courseCode);
 
 		var found = false;
 
 		for(var j=0; j<courses_info.length; j++){
-			if(courses_info[j].code === tmp_courses[i].code){
+			if(courses_info[j].code === this_courseCode){
 				found = true;
-				courses.push(courses_info[j]);
+				var skipThisSection = false;
+
+				for(var k=0; k<tmp_courses.length; k++) {
+					if(tmp_courses[k].code === this_courseCode && tmp_courses[k].isRemoved) {
+
+						if(isLab(courses_info[j])
+							&& courses_info[j].start === tmp_courses[k].start
+							&& courses_info[j].day === tmp_courses[k].day) {
+
+							skipThisSection = true;
+						}
+					}
+				}
+
+				if(skipThisSection) {
+					var cloneObj = JSON.parse(JSON.stringify(courses_info[j]));
+					cloneObj.isRemoved = true;
+					courses.push(cloneObj);
+				}
+				else {
+					courses.push(courses_info[j]);
+				}
 			}
 		}
 
-		if(!found){
-			error_courses.push(tmp_courses[i].code);
+		if(found === false && this_courseCode.trim() !== ""){
+			error_courses.push(this_courseCode);
 		}
 	}
 
@@ -134,15 +161,15 @@ function getSelectedCourseCodeList(){
 	return arr;
 }
 
-function lockScrollToggle(){
-	var body = document.getElementById("body");
-	if(body.className === ""){
-		body.className = "lockScreen";
-	}
-	else{
-		body.className = "";
-	}
-}
+// function lockScrollToggle(){
+// 	var body = document.getElementById("body");
+// 	if(body.className === ""){
+// 		body.className = "lockScreen";
+// 	}
+// 	else{
+// 		body.className = "";
+// 	}
+// }
 function changeValue(courseCode){
 	document.getElementById("coursename").value = courseCode;
 	return true;
@@ -154,15 +181,15 @@ if(urlParam.indexOf("course=") > -1){
 	add(courseCode_param);
 	hasUrlParam = true;
 }
-function lockToggle(){
-	if(localStorage["lockMode"] && localStorage["lockMode"]==="lock"){
-		localStorage["lockMode"] = "unlock";
-	}
-	else{
-		localStorage["lockMode"] = "lock";
-	}
-	genIt(null, null, true);
-}
+// function lockToggle(){
+// 	if(localStorage["lockMode"] && localStorage["lockMode"]==="lock"){
+// 		localStorage["lockMode"] = "unlock";
+// 	}
+// 	else{
+// 		localStorage["lockMode"] = "lock";
+// 	}
+// 	genIt(null, null, true);
+// }
 function convertToStamp(t){
 	return (parseInt(t.substr(0,2)) * 60) + (parseInt(t.substr(3,2)) * 1);
 }
@@ -229,20 +256,20 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 	}
 
 
-	if(
-		allCourseMode===true ||
-		(localStorage["lockMode"] && localStorage["lockMode"]==="lock")
-	){
-		document.getElementById("overlay").className = "lock";
-		document.getElementById("lock").className = "lock";
-		localStorage["lockMode"] = "lock";
-		// document.getElementById("lock").innerHTML = "按此解鎖 Click to unlock<br><small>解鎖後，您將可以從課程表中刪除科目<br>Unlock to remove course(s) from timetable.</small>";
-	}
-	else{
-		document.getElementById("overlay").className = "unlock";
-		document.getElementById("lock").className = "unlock";
-		// document.getElementById("lock").innerHTML = "按此鎖定 Click to lock<br><small>鎖定課程表能避免誤刪課程<br>Lock to protect course(s) from removing.</small>";
-	}
+	// if(
+	// 	allCourseMode===true ||
+	// 	(localStorage["lockMode"] && localStorage["lockMode"]==="lock")
+	// ){
+	// 	document.getElementById("overlay").className = "lock";
+	// 	document.getElementById("lock").className = "lock";
+	// 	localStorage["lockMode"] = "lock";
+	// 	// document.getElementById("lock").innerHTML = "按此解鎖 Click to unlock<br><small>解鎖後，您將可以從課程表中刪除科目<br>Unlock to remove course(s) from timetable.</small>";
+	// }
+	// else{
+	// 	document.getElementById("overlay").className = "unlock";
+	// 	document.getElementById("lock").className = "unlock";
+	// 	// document.getElementById("lock").innerHTML = "按此鎖定 Click to lock<br><small>鎖定課程表能避免誤刪課程<br>Lock to protect course(s) from removing.</small>";
+	// }
 	earliest = undefined;
 	latest = undefined;
 	timetable.innerHTML = template;
@@ -296,7 +323,7 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 
 	for(var i=0; i<courses_list.length; i++){
 
-		if(!courses_list[i].code){
+		if(!courses_list[i].code || courses_list[i].isRemoved){
 			continue;
 		}
 
@@ -348,7 +375,7 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 
 	for(var i=0; i<courses_list.length; i++){
 
-		if(!courses_list[i].code){
+		if(!courses_list[i].code || courses_list[i].isRemoved){
 			continue;
 		}
 		var tmpLineHeight = lineHeight;
@@ -572,7 +599,7 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 	// for(var i=courses_list.length-1; i>=0; i--){
 	for(var i=0; i<courses_list.length; i++){
 
-		if(!courses_list[i].code){
+		if(!courses_list[i].code || courses_list[i].isRemoved){
 			continue;
 		}
 		if(courses_list[i].code !== previousCourse){
@@ -628,6 +655,16 @@ if(!document.getElementById(ths_id)){
 	var li_el = document.createElement("li");
 	li_el.id = ths_id;
 
+	if (allCourseMode!==true && isLab(ths)) {
+		var btnColor = used_colors_list[courses_list[i].code];
+
+		if(!btnColor) {
+			btnColor = "#607d8b";
+		}
+		li_el.className = "no-dots";
+		li_el.innerHTML += "<a href=\"javascript:removeSection("+i+")\" class=\"course-hide\" style=\"color: " + btnColor + "\"><i class=\"fa fa-trash-o\" title=\"Hide\"></i></a>";
+	}
+
 	li_el.innerHTML += "<b>" + dayDisp[dayIndex] + " " + ths.start + "-" + ths.end + "</b><br>"+ ths.venue + (ths.type==='Lecture' ? '' : "(" + ths.type + ")");
 
 	// console.log(ths.code);
@@ -635,6 +672,10 @@ if(!document.getElementById(ths_id)){
 	for(var ix in courses){
 
 		var oppose = courses[ix];
+
+		if(oppose.isRemoved) {
+			continue;
+		}
 
 		if(
 			oppose.code !== ths.code
@@ -1021,13 +1062,71 @@ function add(coursecode, is_importing, should_remain){
 			removeError();
 		}
 		// document.getElementById("coursename").value = "";
-		localStorage["lockMode"] = "unlock";
+		// localStorage["lockMode"] = "unlock";
 	}
 	genIt()
 }
 function clear_input(){
 	document.getElementById("coursename").value = "";
 	fetchIt();
+	genIt(null, true);
+}
+
+// function keepOnly(i) {
+// 	var this_courseCode = courses[i].code;
+// 	var hasRemovedAnySection = false;
+
+// 	for(var j=0; j<courses.length; j++) {
+// 		if(courses[j].code === this_courseCode && isLab(courses[j])){
+// 			if(j !== i){
+// 				if(courses[j].isRemoved) {
+// 					hasRemovedAnySection = true;
+// 					break;
+// 				}
+// 				courses[j].isRemoved = true;
+// 			}
+// 		}
+// 	}
+
+// 	if(hasRemovedAnySection) {
+// 		// add all section back
+
+// 		for(var j=0; j<courses.length; j++){
+// 			if(courses[j].code === this_courseCode && isLab(courses[j])){
+// 				delete courses[j].isRemoved;
+// 			}
+// 		}
+// 	}
+// 	genIt(null, true);
+// }
+
+function removeSection(i){
+	courses[i].isRemoved = true;
+
+	var this_courseCode = courses[i].code;
+	var totalLab = 0;
+	var totalRemovedLab = 0;
+
+	for(var j=0; j<courses.length; j++) {
+		if(courses[j].code === this_courseCode && isLab(courses[j])){
+			totalLab++;
+
+			if(courses[j].isRemoved) {
+				totalRemovedLab++;
+			}
+		}
+	}
+
+	// if all labs are removed
+	if(totalRemovedLab === totalLab) {
+		// add back all the lab.
+
+		for(var j=0; j<courses.length; j++){
+			if(courses[j].code === this_courseCode && isLab(courses[j])){
+				delete courses[j].isRemoved;
+			}
+		}
+	}
 	genIt(null, true);
 }
 function deleteIt(courseCode){
@@ -1779,7 +1878,6 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 		for(var jx in courses_info){
 
 			var ths = courses_info[jx];
-
 			if(ths.code !== im_courses[i].code){
 
 				// if same class, different section

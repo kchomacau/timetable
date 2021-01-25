@@ -266,6 +266,9 @@ a.button-like:hover {
 	background:#ccc;
 	color:#222;
 }
+input[type="submit"] {
+	-webkit-appearance: none;
+}
 #isw-form input[type="submit"] {
 	background: darkturquoise;
 	color:#fff;
@@ -578,7 +581,24 @@ a.btn-like:hover {
 	color:#222;
 	text-decoration: underline;
 }
-#courses-list li a {
+#courses-list li.no-dots {
+	list-style-type: none;
+}
+#courses-list li a.course-hide {
+	margin: 0 -91px -13px -24px;
+	padding: 3px 99px 10px 5px;
+	display: inline-block;
+	position: relative;
+	z-index: 1;
+	text-decoration: none;/*
+	-webkit-border-radius: 2px;
+	border-radius: 2px;*/
+}
+#courses-list li a.course-hide:hover {
+	color: #4b4b4b !important;
+}
+#courses-list li a.add,
+#courses-list li a.del {
 	padding:10px;
 	-webkit-border-radius:3px;
 	border-radius:3px;
@@ -590,10 +610,12 @@ a.btn-like:hover {
 	font-size: 14px;
 	height: 18px;
 }
-#courses-list li a:before {
+#courses-list li a.add:before,
+#courses-list li a.del:before {
 	padding-right: 5px;
 }
-#courses-list li a:before, 
+#courses-list li a.add:before,
+#courses-list li a.del:before, 
 a.umacinfo:after {
 	/*font-size: 30px;
 	display: inline-block;
