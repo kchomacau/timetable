@@ -14,10 +14,15 @@ var default_block = {bg: "#d9d9d9", col: "#888888"}
 function checkTextOverflow(){
 	var spans = document.querySelectorAll(".day-col a span.text-marq");
 	var margin_px = 5;
-	var col_width = 118;
 	var px_per_frame = 1;
 
 	for(var span of spans) {
+		var col_width = $(span).parent().width();
+
+		if(($(span).width() - 1) < col_width) {
+			$(span).removeClass("text-marq");
+			continue;
+		}
 		// if(span.innerHTML.length > 19) {
 			// should run
 
@@ -462,14 +467,19 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 			div.style.height = parseInt(divHeight) + "px";
 			var paddingTop = (divHeight - (tmpLineHeight*4)) / 2;
 			if(allCourseMode === false){
-				var basicHTML = courses_list[i].code + "<br><span" + (courses_list[i].name.length > 19 ? " class=\"text-marq\"" : "") + ">" + courses_list[i].name + "</span><br>" + courses_list[i].venue + "<br>" + courses_list[i].start + "-" + courses_list[i].end;
+				var basicHTML = courses_list[i].code + "<br><span class=\"text-marq\">" + courses_list[i].name + "</span><br>" + courses_list[i].venue + "<br>" + courses_list[i].start + "-" + courses_list[i].end;
+
+				if(isLab(courses_list[i])) {
+					basicHTML += '[Lab]';
+				}
+
 				if(paddingTop > 0){
 				 	div.innerHTML = basicHTML;
 				}
 				else{
-					tmpLineHeight = 8;
-					var paddingTop = (divHeight - (tmpLineHeight*3)) / 2;
-					div.innerHTML = courses_list[i].code + "<br>" + courses_list[i].start + "-" + courses_list[i].end + "<br>" + courses_list[i].venue;
+					tmpLineHeight = 12;
+					var paddingTop = (divHeight - (tmpLineHeight*2)) / 2;
+					div.innerHTML = courses_list[i].code + "<br>@" + courses_list[i].start + '/' + courses_list[i].venue;
 				}
 			}
 			else{
@@ -512,7 +522,7 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 				div.appendChild(span);
 				var span = document.createElement("span");
 				span.className = "alt-text";
-				span.innerHTML = isLab(courses_list[i]) ? "(Lab)" : courses_list[i].code;
+				span.innerHTML = isLab(courses_list[i]) ? "[Lab]" : courses_list[i].code;
 				span.style.height = tmpLineHeight + "px";
 				div.appendChild(span);
 			}
@@ -1187,6 +1197,7 @@ function deleteIt(courseCode){
 	// }
 	for(var i=courses.length-1; i>=0; i--){
 		if(courses[i].code === courseCode){
+			delete courses[i].isRemoved;
 			courses.splice(i, 1);
 		}
 	}
@@ -2184,4 +2195,17 @@ if(localStorage["prSrchText"]){
 
 genIt();
 window.setInterval(checkTextOverflow, 83);
+
+// var i=0;
+// function checkTextBlink() {
+// 	i++;
+// 	console.log(i);
+// 	if(i >= 2) {
+// 		$(".day-col a span.text-blink span").animate({width: "toggle"}, 150);
+// 	}
+// 	if(i==3) {
+// 		i = 0;
+// 	}
+// }
+// window.setInterval(checkTextBlink, 1500);
 
