@@ -17,28 +17,28 @@ function checkTextOverflow(){
 	var px_per_frame = 1;
 
 	for(var span of spans) {
-		var col_width = $(span).parent().width();
+		var col_width = $(span.parentElement).width();
 
-		if(($(span).width() - 1) < col_width) {
+		if((span.offsetWidth - 2) < col_width) {
 			$(span).removeClass("text-marq");
 			continue;
 		}
 		// if(span.innerHTML.length > 19) {
-			// should run
+		// should run
 
-			var left = margin_px;
+		var left = margin_px;
 
-			if(span.style.left) {
-				left = (parseInt(span.style.left) - px_per_frame);
-			}
+		if(span.style.left) {
+			left = (parseInt(span.style.left) - px_per_frame);
+		}
 
-			if(left < (col_width - margin_px - span.offsetWidth)) {
-				left = margin_px;
-			}
+		if(left < (col_width - margin_px - span.offsetWidth)) {
+			left = margin_px;
+		}
 
-			span.style.left = left + 'px';
-			// span.style.marginLeft = left < margin_px ? 0 : ((margin_px - left) + 'px');
-			span.style.visibility = (left === margin_px) ? 'hidden' : '';
+		span.style.left = left + 'px';
+		// span.style.marginLeft = left < margin_px ? 0 : ((margin_px - left) + 'px');
+		span.style.visibility = (left === margin_px) ? 'hidden' : '';
 		// }
 	}
 }
@@ -2194,7 +2194,7 @@ if(localStorage["prSrchText"]){
 }
 
 genIt();
-window.setInterval(checkTextOverflow, 83);
+window.setInterval(checkTextOverflow, 124);
 
 // var i=0;
 // function checkTextBlink() {
