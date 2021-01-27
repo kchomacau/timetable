@@ -1999,7 +1999,7 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 			var namecard = target_code_prof.split(" ")[0];
 			namecard = namecard[0].toUpperCase() + namecard.substr(1).toLowerCase();
 
-			var umacinfo_params = '?New_code=' + target_code_substr + '&prof_name=' + encodeURIComponent(target_code_prof);
+			var umacinfo_params = '?New_code=' + target_code_substr + '&prof_name=' + encodeURIComponent(target_code_prof.split(" \(in ")[0]);
 			profBtn++;
 
 			var umacinfo_text = '<a href="https://www.umeh.top/instructor.html' + umacinfo_params + '" target="_blank" class="umacinfo" id="prof-' + profBtn + '"><i class="fa fa-address-card-o" aria-hidden="true"></i> ' + namecard + '</a>';
