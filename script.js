@@ -44,16 +44,24 @@ function checkTextOverflow(){
 }
 
 function isLab(obj) {
-	if (obj.type ==="Lab") {
 
+	// if this session is a Lab class
+	if (obj.type ==="Lab") {
 		var countLab = 0;
 
-		for(var i=0; i<courses.length; i++) {
-			if(courses[i].code === obj.code && courses[i].type === "Lab") {
+		// loop through courses list
+		for(var course of courses_info) {
+
+			// find Lab for this course
+			if(course.code === obj.code && course.type === "Lab") {
 				countLab++;
+
+				// if more than one, then OK.
+				if(countLab > 1){
+					break;
+				}
 			}
 		}
-
 		return (countLab > 1);
 	}
 	else {
