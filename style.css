@@ -187,6 +187,11 @@ div.col div.background {
 	opacity:0.5;
 	border:0;
 }
+/*div.col a.lab div.background {
+	background-image: url("labbg2.png");
+	background-position: center center;
+	background-repeat: no-repeat;
+}*/
 div.col a:hover {
 	z-index:10;
 	-webkit-transform:scale(1.15);

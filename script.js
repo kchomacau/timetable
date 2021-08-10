@@ -432,6 +432,7 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 		if(!courses_list[i].code || courses_list[i].isRemoved){
 			continue;
 		}
+
 		var tmpLineHeight = lineHeight;
 		var weekday = dayName.indexOf(courses_list[i].day);
 		if(weekday > -1){
@@ -457,11 +458,15 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 				// 	continue;
 				// }
 			}
+
+			var thisIsLab = isLab(courses_list[i]);
 			var div = document.createElement("a");
 			var this_id = courses_list[i].code + "-" +courses_list[i].start + "-" +courses_list[i].end + "-" +courses_list[i].day;
 			if(allCourseMode === false){
-				if (isLab(courses_list[i])) {
+				if (thisIsLab) {
 					div.href = "javascript:removeSection(" + i + ")";
+					// div.className = "lab";
+					// console.log(i);
 				}
 				else {
 					div.href = "javascript:deleteIt('" + courses_list[i].code + "')";
@@ -477,7 +482,7 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 			if(allCourseMode === false){
 				var basicHTML = courses_list[i].code + "<br><span class=\"text-marq\">" + courses_list[i].name + "</span><br>" + courses_list[i].venue + "<br>" + courses_list[i].start + "-" + courses_list[i].end;
 
-				if(isLab(courses_list[i])) {
+				if(thisIsLab) {
 					basicHTML += '[Lab]';
 				}
 
@@ -530,7 +535,7 @@ function genIt(courses_list, no_scroll, is_ctrlZ){
 				div.appendChild(span);
 				var span = document.createElement("span");
 				span.className = "alt-text";
-				span.innerHTML = isLab(courses_list[i]) ? "[Lab]" : courses_list[i].code;
+				span.innerHTML = thisIsLab ? "[Lab]" : courses_list[i].code;
 				span.style.height = tmpLineHeight + "px";
 				div.appendChild(span);
 			}
@@ -1727,6 +1732,35 @@ var totalSort = {};
 // }
 
 
+// // For umeh.top
+// function calcAvgRecom(comments) {
+
+// 	var prev_comment = {};
+// 	var rec_score = 0;
+// 	var rec_sum = 0;
+
+// 	for(var comment of comments) {
+// 		var shouldSkip = true;
+
+// 		for(var key in comment) {
+// 			if(comment[key] !== prev_comment[key]) {
+// 				shouldSkip = false;
+// 				break;
+// 			}
+// 		}
+// 		prev_comment = comment;
+
+// 		if(shouldSkip) {
+// 			console.log("Skipped");
+// 		}
+// 		else{
+// 			rec_score += comment.recommend;
+// 			rec_sum++;
+// 		}
+// 	}
+// 	return Math.floor(rec_score / rec_sum * 10)/10;
+// }
+
 // For umeh.top
 function checkProfBtn(btn, params) {
 
@@ -1754,7 +1788,7 @@ function checkProfBtn(btn, params) {
 			"https://mpserver.umeh.top/all_comment_info/" + params,
 			{}
 		).done(function(data){
-			var marks = data.prof_info.result;
+			var marks = data.prof_info.result; // calcAvgRecom(data.comments); // data.prof_info.result;
 			var star_levels = ["star-o", "star-half-o", "star"];
 			var star_enum = 2;
 
@@ -1999,10 +2033,11 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 			var namecard = target_code_prof.split(" ")[0];
 			namecard = namecard[0].toUpperCase() + namecard.substr(1).toLowerCase();
 
-			var umacinfo_params = '?New_code=' + target_code_substr + '&prof_name=' + encodeURIComponent(target_code_prof.split(" \(in ")[0]);
+			var prof_url = encodeURIComponent(target_code_prof.split(" \(in ")[0]);
+			var umacinfo_params = '?New_code=' + target_code_substr + '&prof_name=' + prof_url;
 			profBtn++;
 
-			var umacinfo_text = '<a href="https://www.umeh.top/instructor.html' + umacinfo_params + '" target="_blank" class="umacinfo" id="prof-' + profBtn + '"><i class="fa fa-address-card-o" aria-hidden="true"></i> ' + namecard + '</a>';
+			var umacinfo_text = '<a href="https://www.umeh.top/reviews/' + target_code_substr + '/' + prof_url + '" target="_blank" class="umacinfo" id="prof-' + profBtn + '"><i class="fa fa-address-card-o" aria-hidden="true"></i> ' + namecard + '</a>';
 
 			// if(window.jQuery){
 			// 	$.get(
