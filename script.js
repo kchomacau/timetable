@@ -1935,7 +1935,7 @@ function find_period_pr(starttext, endtext, day, ven, disable_scroll){
 		for(var i=0; i<im_courses.length; i++){
 			var p = document.createElement("p");
 			var stri = '<a href="javascript:add(\'' + im_courses[i].code + '\',null,true)">' +
-				'<b>' + im_courses[i].code + '</b><br><small>' + im_courses[i].name + '</small></a><small class="location">@' + im_courses[i].venue + ' by ' + im_courses[i].prof + '</small>';
+				'<b>' + im_courses[i].code + '</b><br><small>' + im_courses[i].name + '</small></a><small class="location">@' + im_courses[i].venue + ' by ' + im_courses[i].prof + '<br><strong class="sans-serif">' + im_courses[i].remark+ '</strong></small>';
 
 			var conflict_arr = [];
 			var dates = [];

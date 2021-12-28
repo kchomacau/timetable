@@ -3,6 +3,9 @@ body, input, select {
 	font-size: 13px;
 	color: #1a1a1a;
 }
+.sans-serif {
+	font-family: Arial, sans-serif;
+}
 div.col.day-col,
 ul#courselist > li li,
 #study-plan p small {
