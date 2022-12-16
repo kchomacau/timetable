@@ -5,7 +5,7 @@ var colors = [
 "lightcoral","goldenrod","yellowgreen","darkkhaki","lightseagreen","limegreen","dodgerblue","slateblue","plum","mediumvioletred","sienna","burlywood","orangered","peru","seagreen","cornflowerblue","darkslategrey"
 ];
 
-var last_updated_text = '2022-08-11';
+var last_updated_text = '2022-12-16';
 
 var courses_info = [
 {code:"JAPN1002-001",name:"Practical Japanese II",prof:"KUMIKO KIMURA / MIHO ANDO (in Japanese)",type:"Lecture",day:"MON",start:"14:30",end:"15:45",remark:"Class for : - FAH - JAP19",venue:"E21-G037",host:"FAH-CJS"},
