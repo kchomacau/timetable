@@ -5,7 +5,7 @@ var colors = [
 "lightcoral","goldenrod","yellowgreen","darkkhaki","lightseagreen","limegreen","dodgerblue","slateblue","plum","mediumvioletred","sienna","burlywood","orangered","peru","seagreen","cornflowerblue","darkslategrey"
 ];
 
-var last_updated_text = '2022-12-16';
+var last_updated_text = '2023-8-10';
 
 var courses_info = [
 {code:"Course Code-Section",name:"Course Title",prof:"Teacher Information (in Medium of Instruction)",type:"Lecture / Lab",day:"Day",start:"Time From",end:"Time To",remark:""Class For / Class Not For" Information",venue:"Classroom",host:"Offering Unit-Offering Department"},
