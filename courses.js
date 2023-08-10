@@ -8,7 +8,6 @@ var colors = [
 var last_updated_text = '2023-08-10';
 
 var courses_info = [
-{code:"Course Code-Section",name:"Course Title",prof:"Teacher Information (in Medium of Instruction)",type:"Lecture / Lab",day:"Day",start:"Time From",end:"Time To",remark:""Class For / Class Not For" Information",venue:"Classroom",host:"Offering Unit-Offering Department"},
 {code:"JAPN1000-001",name:"Practical Japanese I",prof:"KUMIKO KIMURA / MIHO ANDO (in Japanese)",type:"Lecture",day:"MON",start:"08:30",end:"09:45",remark:"Class for : - FAH - JAP19",venue:"E21-1013",host:"FAH-CJS"},
 {code:"JAPN1000-001",name:"Practical Japanese I",prof:"KUMIKO KIMURA / MIHO ANDO (in Japanese)",type:"Lecture",day:"TUE",start:"08:30",end:"09:45",remark:"Class for : - FAH - JAP19",venue:"E21-1013",host:"FAH-CJS"},
 {code:"JAPN1000-001",name:"Practical Japanese I",prof:"KUMIKO KIMURA / MIHO ANDO (in Japanese)",type:"Lecture",day:"THU",start:"08:30",end:"09:45",remark:"Class for : - FAH - JAP19",venue:"E21-1013",host:"FAH-CJS"},
